@@ -1,3 +1,69 @@
-{% for i in a %}
-<p>hi!</p>
+{% extends 'new_site/base.html' %}
+{% load custom_filters %}
+
+
+
+{% block title %}{{title}}{% endblock %}
+{% block javascript %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="../../static/js/scripts.js"></script>
+{% endblock %}
+
+{% block content %}
+{% for room in rooms %}
+<div class="main">
+    <h1><a href="/rooms/{{room.id}}">{{ room.name }}</a></h1>
+    <p> Мест: {{room.seats}}</p>
+    <p>{{ schedule|get_item:room.id }}</p>
+    {% if room.board %}
+    <img src="../../static/img/board.jpg" width="30px">
+    {% endif %}
+    {% if room.projector %}
+    <img src="../../static/img/projector.jpg" width="30px">
+    {% endif %}
+</div>
+
 {% endfor %}
+
+
+{% if request.user|has_group:"manager" %}
+<div class="meetings"></div>
+
+<script>
+
+    var seconds = 10;
+    var timeout = 1000 * seconds;
+
+    const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
+
+    // первый вызов при загрузке
+    update_meetings({{ user.id }}, csrftoken);
+
+    // зациклить обновление встречь
+    setTimeout(function run_update_meetings() {
+        update_meetings({{ user.id }}, csrftoken);
+    setTimeout(run_update_meetings, timeout);
+    }, timeout);
+
+</script>
+
+<script>
+    function send_meeting_answer(answer, elem) {
+        $.ajax({
+            type: "post",
+            data: { "answer": answer, "meeting_id": elem.parentNode.id, "csrfmiddlewaretoken": csrftoken },
+            success: function (response) {
+                update_meetings({{ user.id }}, csrftoken);
+        alert(response.answer);
+    },
+
+            }
+        )
+    }
+</script>
+
+{% endif %}
+
+
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'new_site/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+{% for coworker in coworkers %}
+<div class="coworkers">
+
+</div>
+{% endfor %}
+{% endblock %}

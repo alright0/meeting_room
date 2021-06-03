@@ -1,0 +1,53 @@
+{% extends 'new_site/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<div class="room">
+
+    {{room.name}}
+    <input type="submit" value="создать совещание" onclick="create_meeting()">
+    {% if request.user|has_group:"manager" %}
+    <input type="submit" value="Изменить параметры комнаты" onclick="change_room_parameters()">
+    {% endif %}
+    <p>Комната: {{room}}</p>
+
+    <p>Расписание комнаты:</p>
+    {% if schedule %}
+    {% for meeting in schedule %}
+
+    <p>Начало: {{meeting.start_time|date:"d.m.Y H:i"}} - Конец: {{meeting.end_time|date:"d.m.Y H:i"}}.</p>
+
+    {% endfor %}
+    {% else %}
+    <p>Комната свободна!</p>
+    {% endif %}
+
+</div>
+
+
+<script>
+
+    function create_meeting() {
+        $.ajax({
+            type: "post",
+            data: {},
+            success: function (response) {
+            },
+
+        }
+        )
+    }
+</script>
+
+</script>
+
+<script>
+
+    function change_room_parameters() {
+        alert("in progress!")
+    }
+
+</script>
+
+{% endblock %}

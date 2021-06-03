@@ -1,74 +1,116 @@
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import CharField
+from django.contrib.auth.models import User
+from .logic import formatted_time
+from django.utils import timezone
 
 # Create your models here.
-
-
-class Role(models.Model):
-    """Describe user roles"""
-
-    id = models.AutoField(primary_key=True, unique=True)
-    role = models.CharField(max_length=150, unique=True, default="Coworker")
-
-    def __repr__(self):
-        pass
-
-
-class User(models.Model):
-    """Describe users"""
-
-    id = models.AutoField(primary_key=True, unique=True)
-    login = models.CharField(max_length=50, unique=True)
-    password_hash = models.CharField(max_length=150)
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=150, unique=False)
-    last_name = models.CharField(max_length=150, unique=False)
-    role_id = models.ForeignKey(
-        Role, related_name="id_C", on_delete=models.SET_NULL, null=True
-    )
-
-    def __repr__(self):
-        pass
-
-
 class Room(models.Model):
-    """Describe rooms"""
+    """Описывает комнаты"""
 
     id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=150, unique=True)
-    seats = models.IntegerField(null=True)
-    has_desk = models.BooleanField(default=False)
-    has_proj = models.BooleanField(default=False)
-    description = models.TextField(default="No description")
+    seats = models.PositiveIntegerField(null=True)
+    board = models.BooleanField(default=False)
+    projector = models.BooleanField(default=False)
+    description = models.TextField(default="Нет описания")
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
 
-        include_desk = "With desk. " if self.has_desk else ""
-
-        include_proj = "With projector. " if self.has_proj else ""
-
+        include_board = "С маркерной доской. " if self.board else ""
+        include_projector = "С проектором. " if self.projector else ""
         description = (
-            f"Description: {self.description}"
-            if self.description != "No description. "
+            f"Описание: {self.description}"
+            if self.description != "Нет описания. "
             else ""
         )
 
-        return f"Room: {self.name}. {self.seats} seats. {include_desk}{include_proj}{description}."
+        return f"{self.name}. {self.seats} мест(а). {include_board}{include_projector}{description}."
 
 
 class Schedule(models.Model):
-    """Describe schedule model"""
+    """Описывает расписание комнат"""
 
-    Organizator_id = models.ForeignKey(
-        User, related_name="id_organizator", on_delete=models.SET_NULL, null=True
+    id = models.AutoField(primary_key=True, unique=True)
+    organizator_id = models.ForeignKey(
+        User, related_name="id_organizator", on_delete=models.CASCADE, null=True
     )
+
     manager_id = models.ForeignKey(
-        User, related_name="id_manager", on_delete=models.SET_NULL, null=True
+        User, related_name="id_manager", on_delete=models.CASCADE, null=True
     )
     room_id = models.ForeignKey(
         Room, related_name="id_role", on_delete=models.SET_NULL, null=True
     )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    status = CharField(max_length=1, default="W")
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+
+        status = "Подтвеждено" if self.status else "Ожидает подтверждения"
+        start_time = formatted_time(self.start_time)
+        end_time = formatted_time(self.end_time)
+
+        return f"Начало: {start_time}, Конец: {end_time}. Статус: {status}"
+
+    @classmethod
+    def get_room_statuses(cls, rooms) -> dict:
+        """Возвращает словарь ``{room_id: ближайшая дата совещания}``"""
+
+        schedule = dict()
+
+        for room in rooms:
+            nearest_meeting = (
+                cls.objects.filter(
+                    room_id_id=room.id, status=True, start_time__gt=timezone.now()
+                )
+                .order_by("start_time")
+                .first()
+            )
+
+            print(nearest_meeting)
+
+            if nearest_meeting:
+                start_time = formatted_time(nearest_meeting.start_time)
+                end_time = formatted_time(nearest_meeting.end_time)
+
+                nearest_meet = f"Занята с: {start_time} до: {end_time}"
+            else:
+                nearest_meet = "Свободна"
+
+            schedule[str(room.id)] = nearest_meet
+
+        return schedule
+
+    @classmethod
+    def get_room_schedule(cls, room) -> list:
+        """Принимает экземпляр комнаты и Возвращает расписание комнаты"""
+
+        return list(
+            cls.objects.filter(
+                room_id_id=room.id, status=True, start_time__gt=timezone.now()
+            )
+            .order_by("start_time")
+            .all()
+        )
+
+    @classmethod
+    def meetings_to_approve(cls, user_id):
+
+        return list(
+            cls.objects.filter(
+                manager_id_id=user_id, status=False, start_time__gt=timezone.now()
+            )
+            .values(
+                "organizator_id__email",
+                "manager_id__email",
+                "room_id__name",
+                "start_time",
+                "end_time",
+                "id",
+            )
+            .order_by("start_time")
+            .all()
+        )

@@ -1,0 +1,14 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.main{
+    max-width: 800px;
+    margin: auto;
+    display: grid;
+}
+
+.main h1{
+    font-size: 18pt;
+}
