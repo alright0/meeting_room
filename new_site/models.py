@@ -1,9 +1,11 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.base import Model
 from django.db.models.fields import CharField
-from django.contrib.auth.models import User
-from .logic import formatted_time
 from django.utils import timezone
+
+from .logic import formatted_time
+
 
 # Create your models here.
 class Room(models.Model):
@@ -36,7 +38,6 @@ class Schedule(models.Model):
     organizator_id = models.ForeignKey(
         User, related_name="id_organizator", on_delete=models.CASCADE, null=True
     )
-
     manager_id = models.ForeignKey(
         User, related_name="id_manager", on_delete=models.CASCADE, null=True
     )
@@ -46,6 +47,7 @@ class Schedule(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.BooleanField(default=False)
+    title = models.CharField(max_length=140, default="(Без названия)")
 
     def __str__(self):
 
@@ -69,8 +71,6 @@ class Schedule(models.Model):
                 .order_by("start_time")
                 .first()
             )
-
-            print(nearest_meeting)
 
             if nearest_meeting:
                 start_time = formatted_time(nearest_meeting.start_time)
@@ -98,14 +98,16 @@ class Schedule(models.Model):
 
     @classmethod
     def meetings_to_approve(cls, user_id):
+        """Принимает ``user_id`` и возвращает список встречь для подтверждения"""
 
         return list(
             cls.objects.filter(
                 manager_id_id=user_id, status=False, start_time__gt=timezone.now()
             )
             .values(
-                "organizator_id__email",
-                "manager_id__email",
+                "organizator_id__first_name",
+                "organizator_id__last_name",
+                "title",
                 "room_id__name",
                 "start_time",
                 "end_time",

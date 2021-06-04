@@ -11,7 +11,7 @@
 
 {% block content %}
 {% for room in rooms %}
-<div class="main">
+<div class="main" id="room_{{ room.id }}">
     <h1><a href="/rooms/{{room.id}}">{{ room.name }}</a></h1>
     <p> Мест: {{room.seats}}</p>
     <p>{{ schedule|get_item:room.id }}</p>

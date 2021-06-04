@@ -6,39 +6,57 @@
 <div class="room">
 
     {{room.name}}
-    <input type="submit" value="создать совещание" onclick="create_meeting()">
+    <input type="submit" value="показать бронирование" id="show_form_button" onclick="show_form()">
+
     {% if request.user|has_group:"manager" %}
     <input type="submit" value="Изменить параметры комнаты" onclick="change_room_parameters()">
     {% endif %}
-    <p>Комната: {{room}}</p>
 
-    <p>Расписание комнаты:</p>
-    {% if schedule %}
-    {% for meeting in schedule %}
+    <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate hidden=True>
+        {%csrf_token %}
+        {{form.as_p}}
+        <button name="submit" onclick="open_booking_form()">Забронировать</button>
+    </form>
 
-    <p>Начало: {{meeting.start_time|date:"d.m.Y H:i"}} - Конец: {{meeting.end_time|date:"d.m.Y H:i"}}.</p>
+</div>
 
-    {% endfor %}
-    {% else %}
-    <p>Комната свободна!</p>
-    {% endif %}
+<p>Комната: {{room}}</p>
+
+
+<p>Расписание комнаты:</p>
+{% if schedule %}
+{% for meeting in schedule %}
+
+<p>Начало: {{meeting.start_time|date:"d.m.Y H:i"}} - Конец: {{meeting.end_time|date:"d.m.Y H:i"}}.</p>
+
+{% endfor %}
+{% else %}
+<p>Комната свободна!</p>
+{% endif %}
 
 </div>
 
 
 <script>
+    // скрывает и показывает форму создания встречи
+    function show_form() {
+        var elem = document.getElementById('ScheduleForm');
+        var button = document.getElementById('show_form_button');
 
-    function create_meeting() {
-        $.ajax({
-            type: "post",
-            data: {},
-            success: function (response) {
-            },
-
-        }
-        )
+        if (elem.hidden) {
+            button.value = "показать бронирование"
+            elem.hidden = false
+        } else {
+            button.value = "скрыть бронирование"
+            elem.hidden = true
+        };
     }
 </script>
+
+<script>
+    function open_booking_form() {
+    }
+
 
 </script>
 

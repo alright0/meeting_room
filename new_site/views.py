@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from .logic import formatted_time
 from .models import Room, Schedule
+from .forms import ScheduleForm
 
 
 # Create your views here.
@@ -24,6 +25,7 @@ def index(request):
             answer = request.POST.get("answer")
             meeting_id = request.POST.get("meeting_id")
 
+            # здесь отклоняется или подтверждается встреча
             if answer:
                 meet_id = int(meeting_id.replace("meeting_id ", ""))
                 if answer == "accept":
@@ -34,6 +36,7 @@ def index(request):
                 elif answer == "decline":
                     Schedule.objects.get(id=meet_id).delete()
                     result = {"answer": "Встреча отклонена!"}
+
                 return HttpResponse(
                     json.dumps(result, cls=DjangoJSONEncoder),
                     content_type="application/json",
@@ -70,33 +73,33 @@ def room_schedule(request, room_id):
     """Возвращает страницу с расписанием комнаты"""
 
     if request.method == "POST":
-        pass
+        form = ScheduleForm(room_id, request.POST)
+        if form.is_valid():
+
+            new_meeting = Schedule(
+                start_time=request.POST["start_time"],
+                end_time=request.POST["end_time"],
+                organizator_id=request.user,
+                manager_id=User.objects.get(id=request.POST["manager_id"]),
+                room_id=Room.objects.get(id=room_id),
+                title=request.POST["title"],
+            )
+            new_meeting.save()
+
+    else:
+        form = ScheduleForm(room_id)
 
     room = Room.objects.get(id=room_id)
     schedule = Schedule.get_room_schedule(room)
 
-    context = {"title": f"{room.name}. Расписание", "room": room, "schedule": schedule}
+    context = {
+        "title": f"{room.name}. Расписание",
+        "room": room,
+        "schedule": schedule,
+        "form": form,
+    }
 
     return render(request, "new_site/room_schedule.html", context)
-
-
-def my_meetings(request):
-    """Возвращает список собраний"""
-
-    user_id = request.user.id
-
-    i_create = (
-        Schedule.objects.filter(organizator_id_id=user_id).order_by("start_time").all()
-    )
-    i_approve = (
-        Schedule.objects.filter(manager_id_id=user_id, status=False)
-        .order_by("start_time")
-        .all()
-    )
-
-    context = {"i_create": i_create, "I_approve": i_approve}
-
-    return render(request, "new_site/my_meetings.html", context)
 
 
 def coworkers(request):
@@ -106,8 +109,6 @@ def coworkers(request):
     for user in users:
 
         user.groups.change(2)
-
-        # print(user.groups.get(user.id))
 
     context = {"user": users}
 
