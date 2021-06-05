@@ -9,13 +9,9 @@ function update_meetings(user_id, csrftoken) {
             $(".meetings").html("")
             $(".meetings").append("<h2>Встречи для согласования</h2>")
 
-            console.log(response)
-
-
             if (!response.length) {
                 $(".meetings").append('<p style="text-align:center;">Новых встречь нет.</p>')
             }
-
 
             //Для каждой встречи создать контейнер
             $.each(response, function (record) {

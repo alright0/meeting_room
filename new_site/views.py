@@ -60,7 +60,7 @@ def index(request):
         meetings_to_approve = None
 
     context = {
-        "title": "Main Page",
+        "title": "Альфа Переговорки",
         "rooms": rooms,
         "schedule": schedule,
         "meetings_to_approve": meetings_to_approve,

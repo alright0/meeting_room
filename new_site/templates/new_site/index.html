@@ -58,10 +58,10 @@
                     // возвращает html-элемент о подтверждении/отклонении встречи
                     create_html_answer(answer, elem)
 
-                    interval_seconds = 2
+                    interval_seconds = 1
 
                     // запрос на сервер об обновлении списка записей
-                    setInterval(function () {
+                    var answ = setTimeout(function () {
                         $.ajax({
                             type: "post",
                             data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
@@ -71,8 +71,6 @@
                 }
                 )}, 1000 * interval_seconds)
 
-
-                
             }
             </script>
 
