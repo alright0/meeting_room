@@ -27,7 +27,7 @@ def index(request):
 
             # здесь отклоняется или подтверждается встреча
             if answer:
-                meet_id = int(meeting_id.replace("meeting_id ", ""))
+                meet_id = int(meeting_id.replace("meeting_id_", ""))
                 if answer == "accept":
                     this_meeting = Schedule.objects.get(id=meet_id)
                     this_meeting.status = True

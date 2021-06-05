@@ -10,60 +10,74 @@
 {% endblock %}
 
 {% block content %}
-{% for room in rooms %}
-<div class="main" id="room_{{ room.id }}">
-    <h1><a href="/rooms/{{room.id}}">{{ room.name }}</a></h1>
-    <p> Мест: {{room.seats}}</p>
-    <p>{{ schedule|get_item:room.id }}</p>
-    {% if room.board %}
-    <img src="../../static/img/board.jpg" width="30px">
-    {% endif %}
-    {% if room.projector %}
-    <img src="../../static/img/projector.jpg" width="30px">
-    {% endif %}
-</div>
+<div class="rooms">
+    {% for room in rooms %}
+    <div class="room" id="room_{{ room.id }}">
+        <h1><a href="/rooms/{{room.id}}">{{ room.name }}</a></h1>
+        <p><b>Мест:</b> {{room.seats}}</p>
+        <p>{{ schedule|get_item:room.id }}</p>
+        {% if room.board %}
+        <div class="description_image-board">
+            <img src="../../static/img/board.png">
+        </div>
+        {% endif %}
+        {% if room.projector %}
+        <div class="description_image-projector">
+            <img src="../../static/img/projector.png">
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
 
-{% endfor %}
+    {% if request.user|has_group:"manager" %}
+    <div class="add_room"></div>
+    <div class="spacer"></div>
+    <div class="meetings">
+        <div>
 
+            <script>
+                var seconds = 10;
+                var timeout = 1000 * seconds;
+                const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
 
-{% if request.user|has_group:"manager" %}
-<div class="meetings"></div>
-
-<script>
-
-    var seconds = 10;
-    var timeout = 1000 * seconds;
-
-    const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
-
-    // первый вызов при загрузке
-    update_meetings({{ user.id }}, csrftoken);
-
-    // зациклить обновление встречь
-    setTimeout(function run_update_meetings() {
-        update_meetings({{ user.id }}, csrftoken);
-    setTimeout(run_update_meetings, timeout);
-    }, timeout);
-
-</script>
-
-<script>
-    function send_meeting_answer(answer, elem) {
-        $.ajax({
-            type: "post",
-            data: { "answer": answer, "meeting_id": elem.parentNode.id, "csrfmiddlewaretoken": csrftoken },
-            success: function (response) {
+                // первый вызов при загрузке
                 update_meetings({{ user.id }}, csrftoken);
-        alert(response.answer);
-    },
 
+                // зациклить обновление встречь с заданным интервалом
+                setTimeout(function run_update_meetings() {
+                    update_meetings({{ user.id }}, csrftoken);
+                setTimeout(run_update_meetings, timeout);
+    }, timeout);
+            </script>
+
+            <script>
+
+                // функция подтверждения/отклонения встречь
+                function send_meeting_answer(answer, elem) {
+
+                    // возвращает html-элемент о подтверждении/отклонении встречи
+                    create_html_answer(answer, elem)
+
+                    interval_seconds = 2
+
+                    // запрос на сервер об обновлении списка записей
+                    setInterval(function () {
+                        $.ajax({
+                            type: "post",
+                            data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
+                            success: function (response) {
+                                update_meetings({{ user.id }}, csrftoken);
+                    },
+                }
+                )}, 1000 * interval_seconds)
+
+
+                
             }
-        )
-    }
-</script>
+            </script>
 
-{% endif %}
+            {% endif %}
 
+        </div>
 
-
-{% endblock %}
+        {% endblock %}

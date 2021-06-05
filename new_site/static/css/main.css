@@ -1,14 +1,177 @@
 *{
     margin: 0;
     padding: 0;
+    font-family: 'Roboto', sans-serif;
 }
 
-.main{
-    max-width: 800px;
-    margin: auto;
+:root {
+    --logo-color: #0C1134;
+    --standatd-width: 30%;
+    --accept-green: rgb(224, 247, 212);
+    --accept-hover:rgb(216, 238, 204);
+    --decline-red:rgb(247, 212, 212);
+    --decline-hover:rgb(238, 204, 204);
+}
+
+html{
+    background-color: rgb(253, 253, 253);
+}
+
+header{
+    background-color: var(--logo-color);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo{
+    padding: 10px;
+}
+
+.nav{
+    padding: 10px;
+    display: flex;
+    column-gap: 10px;
+
+}
+
+.nav a{
+    color: white;
+    text-decoration:none;
+}
+
+.nav a:hover{
+    text-decoration:solid underline 2px;
+}
+
+.rooms{
     display: grid;
 }
 
-.main h1{
+.room{
+    width: var(--standatd-width);
+    margin: auto;
+    display: grid;
+    grid-template-columns: 80% 10% 10%;
+    grid-template-rows: 50% 25% 25%;
+    align-items: center;
+    margin-top: 10px;
+    border-bottom: solid var(--logo-color) 0.18rem;
+}
+
+.description_image-board{
+    grid-column: 2;
+    grid-row: 1;
+    text-align: center;
+}
+
+.description_image-projector{
+    grid-column: 3;
+    grid-row: 1;
+    text-align: center;
+}
+
+.room h1{
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row: 1;
+    text-align: center;
     font-size: 18pt;
+}
+
+.room p{
+    grid-column: 1;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    padding-bottom: 5px;
+}
+
+.room img{
+    width:30px;
+}
+
+.room a{
+    color: var(--logo-color);
+    text-decoration:none;
+}
+
+.room a:hover{
+    text-decoration:solid underline 2px;
+}
+
+.spacer{
+    margin-bottom: 50px;
+}
+
+.meetings h2{
+    text-align: center;
+    font-size: 14pt;
+    margin-bottom: 10px;
+}
+
+.meeting {
+    display:grid;
+    grid-template-columns: 50% 50%;
+    width: var(--standatd-width);
+
+    margin: auto auto 5px auto;
+}
+
+.meeting p{
+    padding: 1px;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.meeting input{
+    border: none;
+    height: 25px;
+    margin: auto 1px 7px 1px ;
+}
+
+.meeting .accept{
+    background-color: var(--accept-green);
+}
+
+.meeting .accept:hover{
+    background-color: var(--accept-hover);
+}
+
+.meeting .decline{
+    background-color: var(--decline-red);
+}
+
+.meeting .decline:hover{
+    background-color: var(--decline-hover);
+}
+
+
+@media screen and (orientation: portrait) {
+    .room{
+        width: 100%;
+        grid-template-columns: 60% 20% 20%;
+    }
+
+    .room h1{
+        font-size: 22pt;
+        text-align: left;
+    }
+
+    .room img{
+        width:60px;
+    }
+
+    .meeting{
+        width: 100%;
+    }
+
+    .meetings h2{
+        font-size: 18pt;
+    }
+
+    .meeting input{
+        height: 50px;
+    }
 }

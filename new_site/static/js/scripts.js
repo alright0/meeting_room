@@ -7,7 +7,15 @@ function update_meetings(user_id, csrftoken) {
         data: { "id": user_id, "csrfmiddlewaretoken": csrftoken },
         success: function (response) {
             $(".meetings").html("")
-            document.getElementsByClassName('meetings').innerHTML = ""
+            $(".meetings").append("<h2>Встречи для согласования</h2>")
+
+            console.log(response)
+
+
+            if (!response.length) {
+                $(".meetings").append('<p style="text-align:center;">Новых встречь нет.</p>')
+            }
+
 
             //Для каждой встречи создать контейнер
             $.each(response, function (record) {
@@ -16,12 +24,12 @@ function update_meetings(user_id, csrftoken) {
                 end_time = format_date(new Date(rec.end_time))
 
                 $(".meetings").append(`
-                <div class="meeting" id="meeting_id ${rec.id}">
-                <p>Организатор встречи: ${rec.organizator_id__first_name} ${rec.organizator_id__last_name}</p>
-                <p>Время встречи с: ${start_time} до: ${end_time}</>
-                <p>Место: ${rec.room_id__name}. Тема: ${rec.title}</p>
-                <input type="submit" value="Принять" onclick="send_meeting_answer('accept', this)">
-                <input type="submit" value="Отклонить" onclick="send_meeting_answer('decline', this)">
+                <div class="meeting" id="meeting_id_${rec.id}">
+                <p><b>Организатор встречи:</b> ${rec.organizator_id__first_name} ${rec.organizator_id__last_name}</p>
+                <p><b>Дата:</b> ${start_time.slice(0, 8)} <b>Время встречи с:</b> ${start_time.slice(-5)} <b>до</b>: ${end_time.slice(-5)}</>
+                <p><b>Место:</b> ${rec.room_id__name}. <b>Тема:</b> ${rec.title}</p>
+                <input type="submit" value="Принять" class="accept" onclick="send_meeting_answer('accept', String(this.parentNode.id))">
+                <input type="submit" value="Отклонить" class="decline" onclick="send_meeting_answer('decline', String(this.parentNode.id))">
                 </div>
                 `)
 
@@ -43,3 +51,19 @@ function format_date(s_) {
     return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth(), 2)}.${s_.getFullYear()} \
     ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
 };
+
+// функция вызывается при подтверждении/отклоненнии встречи менеджером. 
+function create_html_answer(answer, container_id) {
+
+    if (answer == "accept") {
+        answer_local = "подтвердили"
+        bgcolor = "rgb(224, 247, 212)"
+    } else {
+        answer_local = "отклонили"
+        bgcolor = "rgb(247, 212, 212)"
+    }
+
+    $(`#${container_id}`).html(`
+                <p style="background-color: ${bgcolor};">Вы ${answer_local} встречу!</p>
+                `)
+}
