@@ -15,6 +15,7 @@
     <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate hidden=True>
         {%csrf_token %}
         {{form.as_p}}
+
         <button name="submit" onclick="open_booking_form()">Забронировать</button>
     </form>
 
@@ -63,7 +64,7 @@
 <script>
 
     function change_room_parameters() {
-        alert("in progress!")
+
     }
 
 </script>

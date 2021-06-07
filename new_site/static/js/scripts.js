@@ -3,7 +3,6 @@ function update_meetings(user_id, csrftoken) {
     $.ajax({
         type: 'post',
         mode: 'same-origin',
-
         data: { "id": user_id, "csrfmiddlewaretoken": csrftoken },
         success: function (response) {
             $(".meetings").html("")

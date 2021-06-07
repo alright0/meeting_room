@@ -30,7 +30,9 @@
     {% endfor %}
 
     {% if request.user|has_group:"manager" %}
-    <div class="add_room"></div>
+    <div class="add_room">
+        <a href="/addroom"><input type="button" class="add" value="+ Добавить комнату"></a>
+    </div>
     <div class="spacer"></div>
     <div class="meetings">
         <div>

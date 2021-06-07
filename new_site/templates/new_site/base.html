@@ -26,6 +26,7 @@
     <div class="nav">
         {% if request.user|has_group:"manager" %}
         <a href="/coworkers">Сотрудники</a>
+        <a href="/addroom">Создать комнату</a>
         {% endif %}
     </div>
 </header>

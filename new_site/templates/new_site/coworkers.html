@@ -3,9 +3,13 @@
 
 {% block title %}{{title}}{% endblock %}
 {% block content %}
-{% for coworker in coworkers %}
-<div class="coworkers">
+<div>
+
+    <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate>
+        {%csrf_token %}
+        {{form.as_p}}
+        <button name="submit">Сохранить</button>
+    </form>
 
 </div>
-{% endfor %}
 {% endblock %}

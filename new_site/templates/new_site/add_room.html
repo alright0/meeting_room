@@ -1,0 +1,61 @@
+{% extends 'new_site/base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<div>
+
+    <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate>
+        {%csrf_token %}
+        {{form.fields}}<br>
+        {{form.new_name.label}}{{form.new_name}}
+        <table>{{form.as_table}}</table>
+
+        <button name="submit">Сохранить</button>
+    </form>
+    <!--<select name="Rooms">
+        <option value="add_new">Добавить новую</option>
+        {% for room in rooms_list %}
+        <option value="{{room}}">{{room}}</option>
+        {% endfor %}-->
+
+</div>
+
+<script>
+    const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
+    document.getElementById("id_name").addEventListener("change", eventHandler)
+
+    // подстановка значений комнат в браузере
+    function eventHandler(event) {
+        var room = document.getElementById('id_name');
+        var seats = document.getElementById('id_seats');
+        var board = document.getElementById('id_board');
+        var projector = document.getElementById('id_projector');
+        var description = document.getElementById('id_description');
+
+        if (room.value != 0) {
+            $.ajax({
+                type: 'post',
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                data: { "id": room.value, "csrfmiddlewaretoken": csrftoken },
+                success: function (response) {
+
+                    seats.value = response.seats
+                    board.checked = response.board
+                    projector.checked = response.projector
+                    description.value = response.description
+                    console.log(response);
+                }
+            }
+            )
+        } else {
+            seats.value = 1
+            board.checked = false
+            projector.checked = false
+            description.value = ''
+        }
+    }
+
+</script>
+
+{% endblock %}

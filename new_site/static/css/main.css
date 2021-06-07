@@ -11,6 +11,9 @@
     --accept-hover:rgb(216, 238, 204);
     --decline-red:rgb(247, 212, 212);
     --decline-hover:rgb(238, 204, 204);
+    --add-color:rgb(186, 226, 186);
+    --add-hover:rgb(178, 216, 178);
+
 }
 
 html{
@@ -124,34 +127,57 @@ header{
     grid-column-end: 3;
 }
 
-.meeting input{
+input{
     border: none;
     height: 25px;
     margin: auto 1px 7px 1px ;
 }
 
-.meeting .accept{
+.accept{
     background-color: var(--accept-green);
+    border
 }
 
-.meeting .accept:hover{
+.accept:hover{
     background-color: var(--accept-hover);
 }
 
-.meeting .decline{
+.decline{
     background-color: var(--decline-red);
 }
 
-.meeting .decline:hover{
+.decline:hover{
     background-color: var(--decline-hover);
 }
 
+.add_room{
+    text-align: center;
+}
+
+.add {
+    width: var(--standatd-width);
+    background-color: var(--add-color);
+    font-weight: 600;
+    color: rgb(27, 65, 27);
+    height: 50px;
+    
+}
+
+.add:hover {
+    background-color: var(--add-hover);
+
+}
 
 @media screen and (orientation: portrait) {
     .room{
         width: 100%;
         grid-template-columns: 60% 20% 20%;
     }
+
+    .add {
+        width: 100%;
+    }
+    
 
     .room h1{
         font-size: 22pt;

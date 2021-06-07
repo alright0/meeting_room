@@ -4,13 +4,13 @@ from datetime import datetime
 from django.contrib.auth.models import Group, User
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse
+from django.http import HttpResponse, request
 from django.shortcuts import render
 from django.utils import timezone
 
 from .logic import formatted_time
 from .models import Room, Schedule
-from .forms import ScheduleForm
+from .forms import ScheduleForm, RoomForm, UserForm
 
 
 # Create your views here.
@@ -103,16 +103,70 @@ def room_schedule(request, room_id):
 
 
 def coworkers(request):
+    """Возвращает страницу управления группами пользователей"""
 
-    users = User.objects.all()
+    form = UserForm()
 
-    for user in users:
-
-        user.groups.change(2)
-
-    context = {"user": users}
+    context = {"form": form}
 
     return render(request, "new_site/coworkers.html", context)
+
+
+def add_room(request):
+    """Возвращает страницу с формой создания комнаты"""
+    if request.method == "POST":
+
+        form = RoomForm(request.POST)
+
+        if request.is_ajax():
+            room = Room.objects.get(id=request.POST["id"])
+
+            room_id = room.id
+            room_name = room.name
+            room_seats = room.seats
+            room_board = room.board
+            room_projector = room.projector
+            room_description = room.description
+
+            room_json = json.dumps(
+                {
+                    "id": room_id,
+                    "name": room_name,
+                    "seats": room_seats,
+                    "board": room_board,
+                    "projector": room_projector,
+                    "description": room_description,
+                },
+                cls=DjangoJSONEncoder,
+            )
+
+            return HttpResponse(room_json, content_type="application/json")
+
+        print(request.POST)
+
+        if form.is_valid():
+            room_exists = Room.objects.get(id=request.POST["name"])
+            if room_exists:
+                update_room = form.save(commit=False)
+                room_exists.name = update_room.name
+                room_exists.seats = update_room.seats
+                room_exists.board = update_room.board
+                room_exists.projector = update_room.projector
+                room_exists.description = update_room.description
+                room_exists.save()
+            else:
+                form.save()
+
+    else:
+        # rooms = Room.objects.all()
+
+        # rooms_list = list(room.name for room in rooms)
+
+        form = RoomForm()
+
+    context = {"form": form}
+
+    return render(request, "new_site/add_room.html", context)
 
 
 def login(request):

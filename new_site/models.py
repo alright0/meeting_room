@@ -12,8 +12,8 @@ class Room(models.Model):
     """Описывает комнаты"""
 
     id = models.AutoField(primary_key=True, unique=True)
-    name = models.CharField(max_length=150, unique=True)
-    seats = models.PositiveIntegerField(null=True)
+    name = models.CharField(max_length=150, unique=False)
+    seats = models.PositiveIntegerField(null=True, default=1)
     board = models.BooleanField(default=False)
     projector = models.BooleanField(default=False)
     description = models.TextField(default="Нет описания")

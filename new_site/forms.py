@@ -1,13 +1,86 @@
 from datetime import datetime
 
 from django import forms
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
-from django.forms.widgets import DateTimeInput
+from django.forms.fields import ChoiceField
+from django.forms.models import ModelChoiceField
+from django.forms.widgets import DateTimeInput, Select, SelectDateWidget, SelectMultiple
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import Room, Schedule, User
 from .logic import datetimelocal_value
+from .models import Room, Schedule
+
+
+class UserForm(forms.ModelForm):
+    """Форма обновления данных пользователя"""
+
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+
+class RoomForm(forms.ModelForm):
+    """Форма создания и обновления комнаты"""
+
+    rooms = Room.objects.all()
+    rooms_list = []
+    rooms_list.append(list((0, "+ Новая Комната")))
+    for room in rooms:
+        rooms_list.append(list((room.id, room.name)))
+    new_name = forms.ChoiceField(choices=rooms_list)
+
+    def __init__(self, *args, **kwargs):
+        super(RoomForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Room
+        fields = "__all__"
+        # exclude = []
+        # fields = ["name", "seats", "board", "projector", "description"]
+        labels = {
+            "new_name": "Комнаты",
+            "name": "Название комнаты",
+            "seats": "количество мест",
+            "board": "маркерная доска",
+            "projector": "Проектор",
+            "description": "Описание",
+        }
+
+        rooms = Room.objects.all()
+        rooms_list = []
+        rooms_list.append(list((0, "+ Новая Комната")))
+        for room in rooms:
+            rooms_list.append(list((room.id, room.name)))
+
+        print(rooms_list)
+        # widgets = {"new_name": forms.ChoiceField(queryset=rooms_list)}
+
+    def clean_seats(self):
+        cleaned_data = self.clean()
+        seats = cleaned_data["seats"]
+
+        if seats == 0:
+            raise ValidationError(_("Количество мест должно быть больше 0!"))
+
+        return seats
+
+
+"""class RoomForm(_RoomForm):
+
+    rooms = Room.objects.all()
+    rooms_list = []
+    rooms_list.append(list((0, "+ Новая Комната")))
+    for room in rooms:
+        rooms_list.append(list((room.id, room.name)))
+
+    # widgets = {"_name": forms.Select(choices=rooms_list)}
+    _name = forms.Select()
+
+    class Meta(_RoomForm.Meta):
+        fields = _RoomForm.Meta.fields + ["_name"]
+        labels = {"_name": "Комната"}"""
 
 
 class ScheduleForm(forms.ModelForm):
