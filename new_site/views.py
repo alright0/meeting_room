@@ -114,38 +114,49 @@ def coworkers(request):
 
 def add_room(request):
     """Возвращает страницу с формой создания комнаты"""
+
+    form = RoomForm()
+
     if request.method == "POST":
 
         form = RoomForm(request.POST)
 
         if request.is_ajax():
-            room = Room.objects.get(id=request.POST["id"])
+            try:
+                room = Room.objects.get(id=request.POST["id"])
 
-            room_id = room.id
-            room_name = room.name
-            room_seats = room.seats
-            room_board = room.board
-            room_projector = room.projector
-            room_description = room.description
+                room_id = room.id
+                room_name = room.name
+                room_seats = room.seats
+                room_board = room.board
+                room_projector = room.projector
+                room_description = room.description
 
-            room_json = json.dumps(
-                {
-                    "id": room_id,
-                    "name": room_name,
-                    "seats": room_seats,
-                    "board": room_board,
-                    "projector": room_projector,
-                    "description": room_description,
-                },
-                cls=DjangoJSONEncoder,
-            )
+                room_json = json.dumps(
+                    {
+                        "id": room_id,
+                        "name": room_name,
+                        "seats": room_seats,
+                        "board": room_board,
+                        "projector": room_projector,
+                        "description": room_description,
+                    },
+                    cls=DjangoJSONEncoder,
+                )
+            except:
+                room_json = json.dumps(
+                    {"response": "Запись не найдена!"},
+                    cls=DjangoJSONEncoder,
+                )
 
             return HttpResponse(room_json, content_type="application/json")
 
-        print(request.POST)
-
         if form.is_valid():
-            room_exists = Room.objects.get(id=request.POST["name"])
+            try:
+                room_exists = Room.objects.get(id=request.POST["new_name"])
+            except:
+                room_exists = None
+
             if room_exists:
                 update_room = form.save(commit=False)
                 room_exists.name = update_room.name
@@ -157,12 +168,27 @@ def add_room(request):
             else:
                 form.save()
 
-    else:
-        # rooms = Room.objects.all()
-
-        # rooms_list = list(room.name for room in rooms)
-
+    elif request.method == "DELETE":
         form = RoomForm()
+        try:
+            room = Room.objects.get(id=int(request.body))
+            room.delete()
+            return HttpResponse(
+                json.dumps(
+                    {"response": "Комната удалена!"},
+                    cls=DjangoJSONEncoder,
+                ),
+                content_type="application/json",
+            )
+
+        except:
+            return HttpResponse(
+                json.dumps(
+                    {"response": "Комната уже удалена!"},
+                    cls=DjangoJSONEncoder,
+                ),
+                content_type="application/json",
+            )
 
     context = {"form": form}
 

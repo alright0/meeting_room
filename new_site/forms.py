@@ -54,9 +54,6 @@ class RoomForm(forms.ModelForm):
         for room in rooms:
             rooms_list.append(list((room.id, room.name)))
 
-        print(rooms_list)
-        # widgets = {"new_name": forms.ChoiceField(queryset=rooms_list)}
-
     def clean_seats(self):
         cleaned_data = self.clean()
         seats = cleaned_data["seats"]
@@ -65,22 +62,6 @@ class RoomForm(forms.ModelForm):
             raise ValidationError(_("Количество мест должно быть больше 0!"))
 
         return seats
-
-
-"""class RoomForm(_RoomForm):
-
-    rooms = Room.objects.all()
-    rooms_list = []
-    rooms_list.append(list((0, "+ Новая Комната")))
-    for room in rooms:
-        rooms_list.append(list((room.id, room.name)))
-
-    # widgets = {"_name": forms.Select(choices=rooms_list)}
-    _name = forms.Select()
-
-    class Meta(_RoomForm.Meta):
-        fields = _RoomForm.Meta.fields + ["_name"]
-        labels = {"_name": "Комната"}"""
 
 
 class ScheduleForm(forms.ModelForm):
