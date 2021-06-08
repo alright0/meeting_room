@@ -5,15 +5,18 @@ from django.contrib.auth.models import Group, User
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, request
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 from .logic import formatted_time
 from .models import Room, Schedule
-from .forms import ScheduleForm, RoomForm, UserForm
+from .forms import ScheduleForm, RoomForm, UserForm, LoginForm
 
 
 # Create your views here.
+@login_required
 def index(request):
     """Возвращает страницу со списком всех комнат и их описанием.
     Для менеджеров также возвращает список совещаний для подтверждения"""
@@ -69,6 +72,7 @@ def index(request):
     return render(request, "new_site/index.html", context)
 
 
+@login_required
 def room_schedule(request, room_id):
     """Возвращает страницу с расписанием комнаты"""
 
@@ -102,8 +106,37 @@ def room_schedule(request, room_id):
     return render(request, "new_site/room_schedule.html", context)
 
 
+@login_required
 def coworkers(request):
     """Возвращает страницу управления группами пользователей"""
+
+    if request.method == "POST":
+
+        manager_group = Group.objects.get(name="manager")
+        user_id = request.POST["user"]
+
+        if request.is_ajax():
+            is_manager = Group.objects.filter(user=user_id, name="manager").first()
+
+            if is_manager:
+                manager = {"manager": True}
+            else:
+                manager = {"manager": False}
+
+            return HttpResponse(
+                json.dumps(manager, cls=DjangoJSONEncoder),
+                content_type="application/json",
+            )
+
+        else:
+
+            user_in_group = Group.objects.filter(user=user_id, name="manager")
+            if "groups" in request.POST.keys():
+                if not user_in_group:
+                    manager_group.user_set.add(user_id)
+            else:
+                if user_in_group:
+                    manager_group.user_set.remove(user_id)
 
     form = UserForm()
 
@@ -112,6 +145,7 @@ def coworkers(request):
     return render(request, "new_site/coworkers.html", context)
 
 
+@login_required
 def add_room(request):
     """Возвращает страницу с формой создания комнаты"""
 
@@ -196,4 +230,24 @@ def add_room(request):
 
 
 def login(request):
-    pass
+
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            user = authenticate(username=data["username"], password=data["password"])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponse("Authenticated successfully")
+                else:
+                    return HttpResponse("Disabled account")
+            else:
+                return HttpResponse("Invalid login")
+    else:
+        form = LoginForm()
+
+    context = {"form": form}
+
+    return render(request, "new_site/login.html", context)
+

@@ -13,32 +13,66 @@ from .logic import datetimelocal_value
 from .models import Room, Schedule
 
 
+class LoginForm(forms.Form):
+    """логин"""
+
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
 class UserForm(forms.ModelForm):
     """Форма обновления данных пользователя"""
 
+    users = User.objects.all()
+    user_list = [(user.id, f"{user.first_name} {user.last_name}") for user in users]
+
+    groups = forms.BooleanField()
+    user = forms.ChoiceField(choices=user_list)
+
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "email"]
+        fields = ["groups", "id"]  # , "first_name", "last_name", "email"]
+
+        labels = {
+            "id": "Сотрудник",
+            # "first_name": "Имя",
+            # "last_name": "Фамилия",
+            # "email": "E-Mail",
+            # "groups": "Менеджер",
+        }
+
+        # users = User.objects.all()
+        # user_list = [(user.id, f"{user.first_name} {user.last_name}") for user in users]
+
+        """widgets = {
+            # "groups": forms.BooleanField(),
+            "id": forms.ChoiceField(choices=user_list),
+        }"""
+
+    def __init__(self, *args, **kwargs):
+        super(UserForm, self).__init__(*args, **kwargs)
 
 
 class RoomForm(forms.ModelForm):
     """Форма создания и обновления комнаты"""
 
-    rooms = Room.objects.all()
-    rooms_list = []
-    rooms_list.append(list((0, "+ Новая Комната")))
-    for room in rooms:
-        rooms_list.append(list((room.id, room.name)))
-    new_name = forms.ChoiceField(choices=rooms_list)
+    def _get_rooms_for_combobox():
+        """возвращает список комнат для выпадающего списка"""
 
-    def __init__(self, *args, **kwargs):
-        super(RoomForm, self).__init__(*args, **kwargs)
+        rooms = Room.objects.all()
+        rooms_list = []
+        rooms_list.append(list((0, "+ Новая Комната")))
+        for room in rooms:
+            rooms_list.append(list((room.id, room.name)))
+
+        return rooms_list
+
+    new_name = forms.ChoiceField(choices=_get_rooms_for_combobox())
 
     class Meta:
         model = Room
         fields = "__all__"
-        # exclude = []
-        # fields = ["name", "seats", "board", "projector", "description"]
+
         labels = {
             "new_name": "Комнаты",
             "name": "Название комнаты",
@@ -47,12 +81,6 @@ class RoomForm(forms.ModelForm):
             "projector": "Проектор",
             "description": "Описание",
         }
-
-        rooms = Room.objects.all()
-        rooms_list = []
-        rooms_list.append(list((0, "+ Новая Комната")))
-        for room in rooms:
-            rooms_list.append(list((room.id, room.name)))
 
     def clean_seats(self):
         cleaned_data = self.clean()
@@ -63,12 +91,19 @@ class RoomForm(forms.ModelForm):
 
         return seats
 
+    def __init__(self, *args, **kwargs):
+        super(RoomForm, self).__init__(*args, **kwargs)
+
 
 class ScheduleForm(forms.ModelForm):
     """Форма создания встречи"""
 
+    managers_queryset = User.objects.filter(groups=1).all()
+    manager_id = ModelChoiceField(queryset=managers_queryset)
+
     class Meta:
         model = Schedule
+
         fields = ["manager_id", "title", "start_time", "end_time"]
         labels = {
             "title": "Тема:",
@@ -76,6 +111,7 @@ class ScheduleForm(forms.ModelForm):
             "start_time": "Начало встречи",
             "end_time": "Окончание встречи",
         }
+
         widgets = {
             "start_time": DateTimeInput(
                 attrs={

@@ -34,50 +34,59 @@
         <a href="/addroom"><input type="button" class="add" value="+ Добавить комнату"></a>
     </div>
     <div class="spacer"></div>
-    <div class="meetings">
-        <div>
+    <div class="meetings"></div>
 
-            <script>
-                var seconds = 10;
-                var timeout = 1000 * seconds;
-                const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
+    <script>
+        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/`)
+        console.log(`ws://${window.location.host}/ws/`)
+        socket.connect = function () {
+            alert("Соединение установлено.");
+        };
 
-                // первый вызов при загрузке
-                update_meetings({{ user.id }}, csrftoken);
+    </script>
 
-                // зациклить обновление встречь с заданным интервалом
-                setTimeout(function run_update_meetings() {
-                    update_meetings({{ user.id }}, csrftoken);
-                setTimeout(run_update_meetings, timeout);
+    <script>
+        var seconds = 10;
+        var timeout = 1000 * seconds;
+        const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
+
+        // первый вызов при загрузке
+        update_meetings({{ user.id }}, csrftoken);
+
+        // зациклить обновление встречь с заданным интервалом
+        setTimeout(function run_update_meetings() {
+            update_meetings({{ user.id }}, csrftoken);
+        setTimeout(run_update_meetings, timeout);
     }, timeout);
-            </script>
+    </script>
 
-            <script>
+    <script>
 
-                // функция подтверждения/отклонения встречь
-                function send_meeting_answer(answer, elem) {
+        // функция подтверждения/отклонения встречь
+        function send_meeting_answer(answer, elem) {
 
-                    // возвращает html-элемент о подтверждении/отклонении встречи
-                    create_html_answer(answer, elem)
+            ws.send('{{user.id}}')
+            // возвращает html-элемент о подтверждении/отклонении встречи
+            create_html_answer(answer, elem)
 
-                    interval_seconds = 1
 
-                    // запрос на сервер об обновлении списка записей
-                    var answ = setTimeout(function () {
-                        $.ajax({
-                            type: "post",
-                            data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
-                            success: function (response) {
-                                update_meetings({{ user.id }}, csrftoken);
-                    },
+            interval_seconds = 1
+
+            // запрос на сервер об обновлении списка записей
+            /*var answ = setTimeout(function () {
+                $.ajax({
+                    type: "post",
+                    data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
+                    success: function (response) {
+                        update_meetings({{ user.id }}, csrftoken);
+            },
                 }
-                )}, 1000 * interval_seconds)
+                )}, 1000 * interval_seconds)*/
 
-            }
-            </script>
+        }
+    </script>
 
-            {% endif %}
+    {% endif %}
 
-        </div>
 
-        {% endblock %}
+    {% endblock %}
