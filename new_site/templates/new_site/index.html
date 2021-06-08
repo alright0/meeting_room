@@ -37,10 +37,12 @@
     <div class="meetings"></div>
 
     <script>
-        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/`)
-        console.log(`ws://${window.location.host}/ws/`)
-        socket.connect = function () {
-            alert("Соединение установлено.");
+        const ws = new WebSocket(`ws://${window.location.host}/rooms/43/`)
+
+        ws.onmessage = function (e) {
+            const data = JSON.parse(e.data)
+            //commentsList = document.getElementById
+            console.log("e.data")
         };
 
     </script>
@@ -65,7 +67,7 @@
         // функция подтверждения/отклонения встречь
         function send_meeting_answer(answer, elem) {
 
-            ws.send('{{user.id}}')
+            ws.send(JSON.stringify({ "manager_id": "{{user.id}}" }))
             // возвращает html-элемент о подтверждении/отклонении встречи
             create_html_answer(answer, elem)
 
