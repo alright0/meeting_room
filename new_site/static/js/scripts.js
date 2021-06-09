@@ -43,8 +43,7 @@ function zfill(num, length) {
 
 // функция приведения даты к виду "02.05.2021 15:30"
 function format_date(s_) {
-    return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth(), 2)}.${s_.getFullYear()} \
-    ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
+    return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth(), 2)}.${s_.getFullYear()} ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
 };
 
 // функция вызывается при подтверждении/отклоненнии встречи менеджером. 
@@ -61,4 +60,21 @@ function create_html_answer(answer, container_id) {
     $(`#${container_id}`).html(`
                 <p style="background-color: ${bgcolor};">Вы ${answer_local} встречу!</p>
                 `)
+
+}
+
+// формирует сообщение для уведомлений
+function create_notification(e) {
+    const data = JSON.parse(e.data)
+
+    if (data.answer == "accept") {
+        var answer = "подтвердил(а)"
+    } else {
+        var answer = "отклонил(а)"
+    }
+
+    title_str = `Собрание в ${format_date(new Date(data.start_time))}\nТема: ${data.title}`
+    body_str = `${data.manager_id__first_name} ${data.manager_id__last_name} ${answer} встречу`
+
+    return { "title": title_str, 'body': body_str }
 }

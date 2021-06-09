@@ -12,7 +12,7 @@ class Room(models.Model):
     """Описывает комнаты"""
 
     id = models.AutoField(primary_key=True, unique=True)
-    name = models.CharField(max_length=150, unique=False)
+    name = models.CharField(max_length=150, unique=True)
     seats = models.PositiveIntegerField(null=True, default=1)
     board = models.BooleanField(default=False)
     projector = models.BooleanField(default=False)
@@ -85,7 +85,7 @@ class Schedule(models.Model):
         return schedule
 
     @classmethod
-    def get_room_schedule(cls, room) -> list:
+    def get_room_schedule(cls, room: Room) -> list:
         """Принимает экземпляр комнаты и Возвращает расписание комнаты"""
 
         return list(
@@ -97,7 +97,7 @@ class Schedule(models.Model):
         )
 
     @classmethod
-    def meetings_to_approve(cls, user_id):
+    def meetings_to_approve(cls, user_id: int) -> list:
         """Принимает ``user_id`` и возвращает список встречь для подтверждения"""
 
         return list(
@@ -105,6 +105,7 @@ class Schedule(models.Model):
                 manager_id_id=user_id, status=False, start_time__gt=timezone.now()
             )
             .values(
+                "organizator_id",
                 "organizator_id__first_name",
                 "organizator_id__last_name",
                 "title",
@@ -115,4 +116,24 @@ class Schedule(models.Model):
             )
             .order_by("start_time")
             .all()
+        )
+
+    @classmethod
+    def meeting_details(cls, meeting_id: int) -> dict:
+        """Принимает id встречи и возвращает словарь с ее описанием"""
+
+        return dict(
+            Schedule.objects.filter(id=meeting_id)
+            .values(
+                "organizator_id",
+                "organizator_id__first_name",
+                "organizator_id__last_name",
+                "manager_id__first_name",
+                "manager_id__last_name",
+                "title",
+                "room_id__name",
+                "start_time",
+                "end_time",
+            )
+            .first()
         )

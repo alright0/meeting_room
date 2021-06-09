@@ -3,5 +3,5 @@ from django.urls import re_path
 from . import consumers
 
 websocket_urlpatterns = [
-    re_path(r"rooms/(?P<post_id>\d+)/$", consumers.ChatConsumer.as_asgi()),
+    re_path(r"user/(?P<user_id>\d+)/$", consumers.NotificationConsumer.as_asgi()),
 ]

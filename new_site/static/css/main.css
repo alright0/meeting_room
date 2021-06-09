@@ -13,7 +13,8 @@
     --decline-hover:rgb(238, 204, 204);
     --add-color:rgb(186, 226, 186);
     --add-hover:rgb(178, 216, 178);
-
+    --book-blue:rgb(186, 190, 226);
+    --book-hover:rgb(178, 179, 216);
 }
 
 html{
@@ -168,6 +169,51 @@ input{
 
 }
 
+
+.book{
+    width:100%;
+    font-weight: 600;
+    height: 50px;
+    background-color: var(--book-blue);
+    color: rgb(27, 28, 65)
+}
+
+.book:hover{
+    background-color: var(--book-hover);
+}
+
+.schedule{
+    display:grid;
+    width: var(--standatd-width);
+    margin: auto auto 5px auto;
+}
+
+.schedule h1 {
+    text-align: center;
+    font-size: 16pt;
+    color: var(--logo-color);
+
+}
+
+
+/*
+.site_table{
+    width:100%;
+}*/
+
+.site_table th{
+    text-align: left;
+}
+
+.site_table td{
+    border-bottom: solid var(--logo-color) 1px;
+    display: grid;
+}
+
+.site_table select{
+    border: none;
+}
+
 @media screen and (orientation: portrait) {
     .room{
         width: 100%;
@@ -198,5 +244,9 @@ input{
 
     .meeting input{
         height: 50px;
+    }
+
+    .schedule{
+        width:100%;
     }
 }

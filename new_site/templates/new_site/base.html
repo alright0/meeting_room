@@ -15,6 +15,7 @@
     <title>{% block title %}Document{% endblock %}</title>
     {% block javascript %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../../static/js/scripts.js"></script>
     {% endblock %}
 </head>
 
@@ -39,5 +40,19 @@
         {% block content %}{% endblock %}
     </main>
 </body>
+<script>
+    // Здесь формируются уведомления и открывается вебсокет на свой user_id 
+    Notification.requestPermission().then(function (result) {
+        console.log(result);
+        if (Notification.permission === 'granted') {
+
+            const ws = new WebSocket(`ws://${window.location.host}/user/{{user.id}}/`)
+            ws.onmessage = function (e) {
+                n_dict = create_notification(e)
+                new Notification(n_dict.title, { body: n_dict.body })
+            };
+        };
+    });
+</script>
 
 </html>

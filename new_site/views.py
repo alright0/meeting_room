@@ -31,14 +31,22 @@ def index(request):
             # здесь отклоняется или подтверждается встреча
             if answer:
                 meet_id = int(meeting_id.replace("meeting_id_", ""))
+                meeting_details = Schedule.meeting_details(meet_id)
+
                 if answer == "accept":
                     this_meeting = Schedule.objects.get(id=meet_id)
                     this_meeting.status = True
-                    this_meeting.save()
-                    result = {"answer": "Встреча подтверждена!"}
+                    # this_meeting.save()
+                    result = {
+                        "answer": "Встреча подтверждена!",
+                        "organizator_id": meeting_details["organizator_id"],
+                    }
                 elif answer == "decline":
-                    Schedule.objects.get(id=meet_id).delete()
-                    result = {"answer": "Встреча отклонена!"}
+                    # Schedule.objects.get(id=meet_id).delete()
+                    result = {
+                        "answer": "Встреча отклонена!",
+                        "organizator_id": meeting_details["organizator_id"],
+                    }
 
                 return HttpResponse(
                     json.dumps(result, cls=DjangoJSONEncoder),
@@ -63,7 +71,6 @@ def index(request):
         meetings_to_approve = None
 
     context = {
-        "title": "Альфа Переговорки",
         "rooms": rooms,
         "schedule": schedule,
         "meetings_to_approve": meetings_to_approve,
@@ -250,4 +257,3 @@ def login(request):
     context = {"form": form}
 
     return render(request, "new_site/login.html", context)
-

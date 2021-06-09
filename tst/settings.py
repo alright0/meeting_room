@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-e7$-9welq=zuv((0f=!fx_pt&a(ulj8atew(0%qg8**lk*=dt=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.0.104"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.0.104", "10.81.50.112"]
 
 
 # Application definition
@@ -73,17 +73,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "tst.wsgi.application"
 ASGI_APPLICATION = "tst.asgi.application"
 
-
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
-
-"""CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}"""
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

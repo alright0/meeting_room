@@ -3,37 +3,42 @@
 
 {% block title %}{{title}}{% endblock %}
 {% block content %}
-<div class="room">
+<div class="rooms">
+    <div class="schedule">
+        <h1>{{room.name}}</h1>
+        <p style="text-align: center;"><b>Мест: {{room.seats}}.
+                {% if room.board %} C доской. {% endif %}
+                {% if room.projector %} C проектором.{% endif %}
+            </b></p>
+        <input type="submit" class="book" value="показать бронирование" id="show_form_button" onclick="show_form()">
+        <table class="site_table" id="book_table" hidden="true">
+            <form action="" method="POST" class="book_the_room" id="ScheduleForm">
+                {%csrf_token %}
+                {{form.as_table}}
+                <tr>
+                    <td colspan='2'><button class="book" name="submit">Забронировать</button>
+                </tr>
+                </tr>
+        </table>
+        </form>
+    </div>
 
-    {{room.name}}
-    <input type="submit" value="показать бронирование" id="show_form_button" onclick="show_form()">
-
-    {% if request.user|has_group:"manager" %}
-    <input type="submit" value="Изменить параметры комнаты" onclick="change_room_parameters()">
-    {% endif %}
-
-    <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate hidden=True>
-        {%csrf_token %}
-        {{form.as_p}}
-
-        <button name="submit" onclick="open_booking_form()">Забронировать</button>
-    </form>
-
-</div>
-
-<p>Комната: {{room}}</p>
-
-
-<p>Расписание комнаты:</p>
-{% if schedule %}
-{% for meeting in schedule %}
-
-<p>Начало: {{meeting.start_time|date:"d.m.Y H:i"}} - Конец: {{meeting.end_time|date:"d.m.Y H:i"}}.</p>
-
-{% endfor %}
-{% else %}
-<p>Комната свободна!</p>
-{% endif %}
+    <div class="spacer"></div>
+    <div class="schedule">
+        <p><b>Расписание комнаты:</b></p>
+        </p>
+        {% if schedule %}
+        <ul>
+            {% for meeting in schedule %}
+            <li><b>Начало:</b> {{meeting.start_time|date:"d.m.Y H:i"}} -
+                <b>Конец:</b> {{meeting.end_time|date:"d.m.Y H:i"}}.
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Комната свободна!</p>
+        {% endif %}
+    </div>
 
 </div>
 
@@ -41,32 +46,18 @@
 <script>
     // скрывает и показывает форму создания встречи
     function show_form() {
-        var elem = document.getElementById('ScheduleForm');
+        var elem = document.getElementById('book_table');
         var button = document.getElementById('show_form_button');
 
         if (elem.hidden) {
-            button.value = "показать бронирование"
+            button.value = "скрыть sбронирование"
             elem.hidden = false
         } else {
-            button.value = "скрыть бронирование"
+            button.value = "показать бронирование"
             elem.hidden = true
         };
     }
 </script>
 
-<script>
-    function open_booking_form() {
-    }
-
-
-</script>
-
-<script>
-
-    function change_room_parameters() {
-
-    }
-
-</script>
 
 {% endblock %}

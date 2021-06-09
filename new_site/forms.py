@@ -106,10 +106,10 @@ class ScheduleForm(forms.ModelForm):
 
         fields = ["manager_id", "title", "start_time", "end_time"]
         labels = {
+            "manager_id": "Менеджер:",
             "title": "Тема:",
-            "manager_id": "Менеджер",
-            "start_time": "Начало встречи",
-            "end_time": "Окончание встречи",
+            "start_time": "Начало:",
+            "end_time": "Конец:",
         }
 
         widgets = {
