@@ -12,7 +12,7 @@ class Room(models.Model):
     """Описывает комнаты"""
 
     id = models.AutoField(primary_key=True, unique=True)
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=150, unique=False)
     seats = models.PositiveIntegerField(null=True, default=1)
     board = models.BooleanField(default=False)
     projector = models.BooleanField(default=False)
@@ -30,6 +30,32 @@ class Room(models.Model):
 
         return f"{self.name}. {self.seats} мест(а). {include_board}{include_projector}{description}."
 
+    @classmethod
+    def get_room_info(cls, room_id):
+
+        room = cls.objects.get(id=room_id)
+
+        if room:
+            room_id = room.id
+            room_name = room.name
+            room_seats = room.seats
+            room_board = room.board
+            room_projector = room.projector
+            room_description = room.description
+
+            room_json = {
+                "id": room_id,
+                "name": room_name,
+                "seats": room_seats,
+                "board": room_board,
+                "projector": room_projector,
+                "description": room_description,
+            }
+        else:
+            room_json = {"response": "Запись не найдена!"}
+
+        return room_json
+
 
 class Schedule(models.Model):
     """Описывает расписание комнат"""
@@ -42,7 +68,7 @@ class Schedule(models.Model):
         User, related_name="id_manager", on_delete=models.CASCADE, null=True
     )
     room_id = models.ForeignKey(
-        Room, related_name="id_role", on_delete=models.SET_NULL, null=True
+        Room, related_name="id_role", on_delete=models.CASCADE, null=True
     )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -102,7 +128,7 @@ class Schedule(models.Model):
 
         return list(
             cls.objects.filter(
-                manager_id_id=user_id, status=False, start_time__gt=timezone.now()
+                manager_id_id=user_id, status=False, start_time__gt=timezone.localtime()
             )
             .values(
                 "organizator_id",

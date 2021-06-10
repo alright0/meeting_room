@@ -17,6 +17,10 @@
     --book-hover:rgb(178, 179, 216);
 }
 
+textarea { 
+    resize: vertical; 
+}
+
 html{
     background-color: rgb(253, 253, 253);
 }
@@ -135,6 +139,7 @@ input{
 }
 
 .accept{
+    border: none;
     background-color: var(--accept-green);
     border
 }
@@ -144,6 +149,7 @@ input{
 }
 
 .decline{
+    border: none;
     background-color: var(--decline-red);
 }
 
@@ -156,6 +162,7 @@ input{
 }
 
 .add {
+    border: none;
     width: var(--standatd-width);
     background-color: var(--add-color);
     font-weight: 600;
@@ -195,24 +202,42 @@ input{
 
 }
 
+.schedule ul{
+    padding-left: 20px;
+}
 
-/*
 .site_table{
     width:100%;
-}*/
+    table-layout: fixed;
+}
 
 .site_table th{
     text-align: left;
 }
 
-.site_table td{
+.site_table td :not(ul){
     border-bottom: solid var(--logo-color) 1px;
-    display: grid;
+    width: 100%;
+}
+
+.site_table td button{
+    border: none;
+
+}
+
+.site_table button{
+    border: none;
 }
 
 .site_table select{
     border: none;
+
 }
+
+.site_table ul{
+    color:red;
+}
+
 
 @media screen and (orientation: portrait) {
     .room{

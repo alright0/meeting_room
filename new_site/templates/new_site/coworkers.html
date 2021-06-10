@@ -1,15 +1,15 @@
 {% extends 'new_site/base.html' %}
 {% load custom_filters %}
 
-{% block title %}{{title}}{% endblock %}
+{% block title %}Альфа.Сотрудники{% endblock %}
 {% block content %}
-<div>
-
+<div class="schedule">
+    <h1>Роли сотрудников</h1>
     <form action="" method="POST" class="book_the_room" id="ScheduleForm" novalidate>
-        <table>{%csrf_token %}
+        <table class="site_table">{%csrf_token %}
             {{form.as_table}}
             <tr>
-                <td colspan="2"><button name="submit">Сохранить</button></td>
+                <td colspan="2"><button name="submit" class="add">Сохранить</button></td>
             </tr>
         </table>
     </form>

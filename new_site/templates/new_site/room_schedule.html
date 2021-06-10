@@ -1,7 +1,7 @@
 {% extends 'new_site/base.html' %}
 {% load custom_filters %}
 
-{% block title %}{{title}}{% endblock %}
+{% block title %}{{room.name}}. Подробности{% endblock %}
 {% block content %}
 <div class="rooms">
     <div class="schedule">
@@ -42,6 +42,19 @@
 
 </div>
 
+<script>
+    // скрипт задает начальные значения даты начала и конца встречи
+
+    var start = _add_and_format_time_for_datetime_local(new Date(), 1)
+    var end = _add_and_format_time_for_datetime_local(new Date(), 2)
+
+    document.getElementById("id_start_time").value = start
+    document.getElementById("id_end_time").value = end
+
+    document.getElementById("id_start_time").addEventListener("change", start_time_changed)
+    document.getElementById("id_end_time").addEventListener("change", end_time_changed)
+
+</script>
 
 <script>
     // скрывает и показывает форму создания встречи
@@ -50,7 +63,7 @@
         var button = document.getElementById('show_form_button');
 
         if (elem.hidden) {
-            button.value = "скрыть sбронирование"
+            button.value = "скрыть бронирование"
             elem.hidden = false
         } else {
             button.value = "показать бронирование"

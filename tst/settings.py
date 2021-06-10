@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "channels",
     "new_site",
+    # "new_site.apps.NewSiteConfig",
 ]
 
 MIDDLEWARE = [

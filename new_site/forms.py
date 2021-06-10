@@ -3,13 +3,19 @@ from datetime import datetime
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
-from django.forms.fields import ChoiceField
+from django.forms.fields import CharField, ChoiceField
 from django.forms.models import ModelChoiceField
-from django.forms.widgets import DateTimeInput, Select, SelectDateWidget, SelectMultiple
+from django.forms.widgets import (
+    DateTimeInput,
+    Select,
+    SelectDateWidget,
+    SelectMultiple,
+    TextInput,
+)
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .logic import datetimelocal_value
+
 from .models import Room, Schedule
 
 
@@ -24,30 +30,24 @@ class UserForm(forms.ModelForm):
     """Форма обновления данных пользователя"""
 
     users = User.objects.all()
-    user_list = [(user.id, f"{user.first_name} {user.last_name}") for user in users]
 
-    groups = forms.BooleanField()
-    user = forms.ChoiceField(choices=user_list)
+    user = forms.ModelChoiceField(
+        queryset=users,
+        required=False,
+        label="Сотрудник:",
+    )
+    groups = forms.BooleanField(
+        label="Менеджер:",
+    )
+
+    field_order = ["user", "groups"]
 
     class Meta:
         model = User
-        fields = ["groups", "id"]  # , "first_name", "last_name", "email"]
-
+        fields = ["id", "groups"]
         labels = {
             "id": "Сотрудник",
-            # "first_name": "Имя",
-            # "last_name": "Фамилия",
-            # "email": "E-Mail",
-            # "groups": "Менеджер",
         }
-
-        # users = User.objects.all()
-        # user_list = [(user.id, f"{user.first_name} {user.last_name}") for user in users]
-
-        """widgets = {
-            # "groups": forms.BooleanField(),
-            "id": forms.ChoiceField(choices=user_list),
-        }"""
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
@@ -56,31 +56,31 @@ class UserForm(forms.ModelForm):
 class RoomForm(forms.ModelForm):
     """Форма создания и обновления комнаты"""
 
-    def _get_rooms_for_combobox():
-        """возвращает список комнат для выпадающего списка"""
-
-        rooms = Room.objects.all()
-        rooms_list = []
-        rooms_list.append(list((0, "+ Новая Комната")))
-        for room in rooms:
-            rooms_list.append(list((room.id, room.name)))
-
-        return rooms_list
-
-    new_name = forms.ChoiceField(choices=_get_rooms_for_combobox())
+    rooms = Room.objects.all()
+    id = forms.ModelChoiceField(
+        queryset=rooms, required=False, empty_label="+ создать комнату", label="Комнаты"
+    )
 
     class Meta:
         model = Room
         fields = "__all__"
 
         labels = {
-            "new_name": "Комнаты",
             "name": "Название комнаты",
             "seats": "количество мест",
             "board": "маркерная доска",
             "projector": "Проектор",
             "description": "Описание",
         }
+
+    field_order = [
+        "id",
+        "name",
+        "seats",
+        "board",
+        "projector",
+        "description",
+    ]
 
     def clean_seats(self):
         cleaned_data = self.clean()
@@ -99,7 +99,7 @@ class ScheduleForm(forms.ModelForm):
     """Форма создания встречи"""
 
     managers_queryset = User.objects.filter(groups=1).all()
-    manager_id = ModelChoiceField(queryset=managers_queryset)
+    manager_id = ModelChoiceField(queryset=managers_queryset, label="Менеджер:")
 
     class Meta:
         model = Schedule
@@ -117,14 +117,12 @@ class ScheduleForm(forms.ModelForm):
                 attrs={
                     "type": "datetime-local",
                     "min": datetime.now().strftime("%Y-%m-%dT%H:00"),
-                    "value": datetimelocal_value(1),
                 }
             ),
             "end_time": DateTimeInput(
                 attrs={
                     "type": "datetime-local",
                     "min": datetime.now().strftime("%Y-%m-%dT%H:00"),
-                    "value": datetimelocal_value(2),
                 }
             ),
         }

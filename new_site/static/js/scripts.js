@@ -46,7 +46,9 @@ function format_date(s_) {
     return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth(), 2)}.${s_.getFullYear()} ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
 };
 
-// функция вызывается при подтверждении/отклоненнии встречи менеджером. 
+
+// функция вызывается при подтверждении/отклоненнии встречи менеджером и возвращает html-заглушку
+// на месте встречи 
 function create_html_answer(answer, container_id) {
 
     if (answer == "accept") {
@@ -63,7 +65,7 @@ function create_html_answer(answer, container_id) {
 
 }
 
-// формирует сообщение для уведомлений
+// формирует сообщение для уведомлений через каналы
 function create_notification(e) {
     const data = JSON.parse(e.data)
 
@@ -77,4 +79,108 @@ function create_notification(e) {
     body_str = `${data.manager_id__first_name} ${data.manager_id__last_name} ${answer} встречу`
 
     return { "title": title_str, 'body': body_str }
+}
+
+// функция относится к созданию встречи
+// меняет значение даты конца, если начальная дата изменилась и стала меньше конечной 
+function start_time_changed(event) {
+
+    var start_time = new Date(document.getElementById("id_start_time").value);
+    var end_time = new Date(document.getElementById("id_end_time").value)
+
+    if (end_time <= start_time) {
+        var new_end_time = _add_and_format_time_for_datetime_local(start_time, 1);
+        document.getElementById("id_end_time").value = new_end_time
+    }
+}
+
+// функция относится к созданию встречи
+// меняет значение даты начала, если конечная дата изменилась и стала меньше начальной
+function end_time_changed(event) {
+    var start_time = new Date(document.getElementById("id_start_time").value);
+    var end_time = new Date(document.getElementById("id_end_time").value)
+
+    //console.log(start_time, end_time)
+
+    if (end_time <= start_time) {
+        var new_start_time = _add_and_format_time_for_datetime_local(end_time, -1);
+        document.getElementById("id_start_time").value = new_start_time
+
+
+    }
+}
+
+// возвращает дату в текстовом формате, подходящую для вставки в datetime-local
+function _add_and_format_time_for_datetime_local(s_, o_) {
+    return `${s_.getFullYear()}-${zfill(s_.getMonth() + 1, 2)}-${zfill(s_.getDate(), 2)}T${zfill(s_.getHours() + o_, 2)}:00`
+
+};
+
+// возвращает информацию о комнате add_room
+function get_room_info(event) {
+
+    var del_button = document.getElementById("decline")
+    var is_del_exists = document.body.contains(del_button)
+
+    var id = document.getElementById('id_id');
+    var room = document.getElementById('id_name');
+    var seats = document.getElementById('id_seats');
+    var board = document.getElementById('id_board');
+    var projector = document.getElementById('id_projector');
+    var description = document.getElementById('id_description');
+
+    if (id.value != 0) {
+        document.getElementById('accept').innerText = "Обновить"
+        if (!is_del_exists) {
+
+            $("#del_container").append(`<button name="delete" class="decline" id="decline" 
+                onclick="delete_room()">Удалить</button>`)
+        }
+        $.ajax({
+            type: 'post',
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            data: { "id": id.value, "csrfmiddlewaretoken": csrftoken },
+            success: function (response) {
+                room.value = response.name
+                seats.value = response.seats
+                board.checked = response.board
+                projector.checked = response.projector
+                description.value = response.description
+                console.log(response);
+
+
+            },
+            error: { "response": "Запись не найдена!" }
+        }
+        )
+    } else {
+        document.getElementById('accept').innerText = "Создать"
+        room.value = ''
+        seats.value = 1
+        board.checked = false
+        projector.checked = false
+        description.value = ''
+        if (is_del_exists) {
+            $("#decline").remove()
+        }
+    }
+}
+
+//удаляет выбранную комнату в add_room
+function delete_room() {
+
+    var id = document.getElementById('id_id');
+
+    if (id.value != 0) {
+        $.ajax({
+            type: 'POST',
+            data: { 'id': id.value, "csrfmiddlewaretoken": csrftoken },
+            success: function (response) {
+                window.location.replace("/")
+            },
+            error: function () {
+                alert("что-то пошло не так!");
+            }
+        })
+    }
 }
