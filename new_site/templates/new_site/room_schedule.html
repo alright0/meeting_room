@@ -6,12 +6,13 @@
 <div class="rooms">
     <div class="schedule">
         <h1>{{room.name}}</h1>
-        <p style="text-align: center;"><b>Мест: {{room.seats}}.
+        <p><b>Мест: {{room.seats}}.
                 {% if room.board %} C доской. {% endif %}
                 {% if room.projector %} C проектором.{% endif %}
             </b></p>
+        <p><b>{% if room.description != "Нет описания" %}Описание: {{ room.description }}{% endif %}</b></p>
         <input type="submit" class="book" value="показать бронирование" id="show_form_button" onclick="show_form()">
-        <table class="site_table" id="book_table" hidden="true">
+        <table class="site_table" id="book_table" {{form_is_open}}>
             <form action="" method="POST" class="book_the_room" id="ScheduleForm">
                 {%csrf_token %}
                 {{form.as_table}}
@@ -44,7 +45,6 @@
 
 <script>
     // скрипт задает начальные значения даты начала и конца встречи
-
     var start = _add_and_format_time_for_datetime_local(new Date(), 1)
     var end = _add_and_format_time_for_datetime_local(new Date(), 2)
 
@@ -57,19 +57,15 @@
 </script>
 
 <script>
-    // скрывает и показывает форму создания встречи
-    function show_form() {
-        var elem = document.getElementById('book_table');
-        var button = document.getElementById('show_form_button');
+    // устанавливает начальное значение кнопки бронирования
+    book_table = document.getElementById('book_table')
 
-        if (elem.hidden) {
-            button.value = "скрыть бронирование"
-            elem.hidden = false
-        } else {
-            button.value = "показать бронирование"
-            elem.hidden = true
-        };
+    if (book_table.hidden) {
+        book_table.value = "показать бронирование"
+    } else {
+        book_table.value = "скрыть бронирование"
     }
+
 </script>
 
 

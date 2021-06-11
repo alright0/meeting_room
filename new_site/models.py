@@ -23,12 +23,12 @@ class Room(models.Model):
         include_board = "С маркерной доской. " if self.board else ""
         include_projector = "С проектором. " if self.projector else ""
         description = (
-            f"Описание: {self.description}"
-            if self.description != "Нет описания. "
+            f"Описание: {self.description}."
+            if self.description != "Нет описания"
             else ""
         )
 
-        return f"{self.name}. {self.seats} мест(а). {include_board}{include_projector}{description}."
+        return f"{self.name}. {self.seats} мест(а). {include_board}{include_projector}{description}"
 
     @classmethod
     def get_room_info(cls, room_id):
@@ -72,7 +72,7 @@ class Schedule(models.Model):
     )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(null=True)
     title = models.CharField(max_length=140, default="(Без названия)")
 
     def __str__(self):
@@ -92,7 +92,7 @@ class Schedule(models.Model):
         for room in rooms:
             nearest_meeting = (
                 cls.objects.filter(
-                    room_id_id=room.id, status=True, start_time__gt=timezone.now()
+                    room_id_id=room.id, status=True, start_time__gt=timezone.localtime()
                 )
                 .order_by("start_time")
                 .first()
@@ -102,7 +102,7 @@ class Schedule(models.Model):
                 start_time = formatted_time(nearest_meeting.start_time)
                 end_time = formatted_time(nearest_meeting.end_time)
 
-                nearest_meet = f"Занята с: {start_time} до: {end_time}"
+                nearest_meet = f"Занята с: {start_time} до: {end_time[-5:]}"
             else:
                 nearest_meet = "Свободна"
 
@@ -116,7 +116,7 @@ class Schedule(models.Model):
 
         return list(
             cls.objects.filter(
-                room_id_id=room.id, status=True, start_time__gt=timezone.now()
+                room_id_id=room.id, status=True, start_time__gt=timezone.localtime()
             )
             .order_by("start_time")
             .all()
@@ -124,11 +124,11 @@ class Schedule(models.Model):
 
     @classmethod
     def meetings_to_approve(cls, user_id: int) -> list:
-        """Принимает ``user_id`` и возвращает список встречь для подтверждения"""
+        """Принимает ``user_id`` и возвращает список  встречь для подтверждения"""
 
         return list(
             cls.objects.filter(
-                manager_id_id=user_id, status=False, start_time__gt=timezone.localtime()
+                manager_id_id=user_id, status=None, start_time__gt=timezone.localtime()
             )
             .values(
                 "organizator_id",

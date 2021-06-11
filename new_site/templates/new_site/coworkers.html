@@ -16,37 +16,9 @@
 
 </div>
 
-
-
 <script>
     const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
-    get_user_data()
     document.getElementById("id_user").addEventListener("change", get_user_data)
-
-    // Обновляет значение группы пользователя при выборе в select
-    function get_user_data() {
-        var id = document.getElementById('id_user');
-        //var manager =document.getElementById('id_group');
-        $.ajax({
-            type: 'POST',
-            headers: { "X-Requested-With": "XMLHttpRequest" },
-            data: { "user": id.value, "csrfmiddlewaretoken": csrftoken },
-            success: function (response) {
-                group = document.getElementById("id_groups")
-                group.checked = response.manager
-                console.log(response)
-
-            },
-            error: {},
-        })
-    }
-
-
-
-
 </script>
-
-
-
 
 {% endblock %}

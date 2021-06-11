@@ -1,16 +1,14 @@
 {% extends 'new_site/base.html' %}
 {% load custom_filters %}
 
-
-
 {% block title %}Альфа.Совещания{% endblock %}
-
 
 {% block content %}
 <div class="rooms">
+    <h1>Список комнат</h1>
     {% for room in rooms %}
     <div class="room" id="room_{{ room.id }}">
-        <h1><a href="/rooms/{{room.id}}">{{ room.name }}</a></h1>
+        <h2><a href="/rooms/{{room.id}}">{{ room.name }}</a></h2>
         <p><b>Мест:</b> {{room.seats}}</p>
         <p>{{ schedule|get_item:room.id }}</p>
         {% if room.board %}
@@ -35,56 +33,31 @@
 
     <script>
         // обновление списка встречь с заданным интервалом
-        var seconds = 10;
-        var timeout = 1000 * seconds;
         const csrftoken = document.getElementsByName('csrfmiddlewaretoken').item(0).value
+        var seconds = 10;
 
         // первый вызов при загрузке
         update_meetings({{ user.id }}, csrftoken);
 
         setTimeout(function run_update_meetings() {
             update_meetings({{ user.id }}, csrftoken);
-        setTimeout(run_update_meetings, timeout);
-    }, timeout);
+        setTimeout(run_update_meetings, 1000 * seconds);
+    }, 1000 * seconds);
     </script>
 
     <script>
-
-        // функция подтверждения/отклонения встречь, вызывается нажатием кнопок подтвердить/отклонить
+        // функция подтверждения/отклонения встречь, 
+        // вызывается нажатием кнопок подтвердить/отклонить
         function send_meeting_answer(answer, elem) {
-
             // создание html-заглушки на месте встречи после подтверждения/отклонения
-            create_html_answer(answer, elem)
-            interval_seconds = 1
+            create_html_answer(answer, elem, csrftoken)
 
             // запрос на сервер об обновлении списка записей
-            var answ = setTimeout(function () {
-                $.ajax({
-                    type: "post",
-                    data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
-                    success: function (response) {
-                        console.log(response)
-
-                        //сокет на отправку уведомлений пользователям
-                        const ws_to_organizator = new WebSocket(`ws://${window.location.host}/user/${response.organizator_id}/`)
-
-                        var check_socket_ready = function (data) {
-                            if (!ws_to_organizator.readyState) {
-                                setTimeout(function () {
-                                    check_socket_ready(data);
-                                }, 100);
-                            } else {
-                                ws_to_organizator.send(data)
-                                ws_to_organizator.close()
-                            }
-                        };
-                        check_socket_ready(JSON.stringify({ "meeting_id": elem, "answer": answer }));
-                        update_meetings({{ user.id }}, csrftoken);
-            },
-                })
-                }, 1000 * interval_seconds);}
-
-
+            timeout_seconds = 1
+            setTimeout(function () {
+                send_answer_to_db_and_organizator(answer, elem, csrftoken);
+                update_meetings({{ user.id }}, csrftoken);
+        }, 1000 * timeout_seconds);}
     </script>
 
     {% endif %}

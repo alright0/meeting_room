@@ -2,10 +2,7 @@ import json
 from datetime import datetime
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import (
-    login_required,
-    permission_required,
-)
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, User
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
@@ -14,11 +11,11 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from .forms import LoginForm, RoomForm, ScheduleForm, UserForm
-from .logic import formatted_time
+from .logic import formatted_time, parse_meeting_id
 from .models import Room, Schedule
+from django.http import HttpResponseNotFound
 
 
-# Create your views here.
 @login_required
 def index(request):
     """Возвращает страницу со списком всех комнат и их описанием.
@@ -26,31 +23,21 @@ def index(request):
 
     if request.method == "POST":
         if request.user.groups.filter(name="manager"):
-            answer = request.POST.get("answer")
-            meeting_id = request.POST.get("meeting_id")
 
             # здесь отклоняется или подтверждается встреча
+            answer = request.POST.get("answer")
             if answer:
-                meet_id = int(meeting_id.replace("meeting_id_", ""))
+                meet_id = parse_meeting_id(request.POST.get("meeting_id"))
                 meeting_details = Schedule.meeting_details(meet_id)
-
-                if answer == "accept":
-                    this_meeting = Schedule.objects.get(id=meet_id)
-                    this_meeting.status = True
-                    this_meeting.save()
-                    result = {
-                        "answer": "Встреча подтверждена!",
-                        "organizator_id": meeting_details["organizator_id"],
-                    }
-                elif answer == "decline":
-                    Schedule.objects.get(id=meet_id).delete()
-                    result = {
-                        "answer": "Встреча отклонена!",
-                        "organizator_id": meeting_details["organizator_id"],
-                    }
+                this_meeting = Schedule.objects.get(id=meet_id)
+                this_meeting.status = True if answer == "accept" else False
+                this_meeting.save()
 
                 return HttpResponse(
-                    json.dumps(result, cls=DjangoJSONEncoder),
+                    json.dumps(
+                        {"organizator_id": meeting_details["organizator_id"]},
+                        cls=DjangoJSONEncoder,
+                    ),
                     content_type="application/json",
                 )
 
@@ -58,23 +45,13 @@ def index(request):
                 Schedule.meetings_to_approve(request.user.id), cls=DjangoJSONEncoder
             )
 
-        else:
-            meetings_to_approve = json.dumps([{}])
-
-        return HttpResponse(meetings_to_approve, content_type="application/json")
+            return HttpResponse(meetings_to_approve, content_type="application/json")
 
     rooms = Room.objects.all()
     schedule = Schedule.get_room_statuses(rooms)
-
-    if request.user.groups.filter(name="manager"):
-        meetings_to_approve = Schedule.meetings_to_approve(request.user.id)
-    else:
-        meetings_to_approve = None
-
     context = {
         "rooms": rooms,
         "schedule": schedule,
-        "meetings_to_approve": meetings_to_approve,
     }
 
     return render(request, "new_site/index.html", context)
@@ -83,6 +60,8 @@ def index(request):
 @login_required
 def room_schedule(request, room_id):
     """Возвращает страницу с расписанием комнаты"""
+
+    form_is_open = "hidden=true"
 
     if request.method == "POST":
         form = ScheduleForm(room_id, request.POST)
@@ -98,6 +77,8 @@ def room_schedule(request, room_id):
             new_meeting.save()
             return redirect("/")
 
+        form_is_open = ""
+
     else:
         form = ScheduleForm(room_id)
 
@@ -108,6 +89,7 @@ def room_schedule(request, room_id):
         "room": room,
         "schedule": schedule,
         "form": form,
+        "form_is_open": form_is_open,
     }
 
     return render(request, "new_site/room_schedule.html", context)
@@ -188,6 +170,7 @@ def add_room(request):
                     room_exists = None
 
                 if room_exists:
+                    # Обновление существущей комнаты
                     update_room = form.save(commit=False)
                     room_exists.name = update_room.name
                     room_exists.seats = update_room.seats
@@ -196,6 +179,7 @@ def add_room(request):
                     room_exists.description = update_room.description
                     room_exists.save()
                 else:
+                    # создание новой комнаты
                     form.save()
                 return redirect("/")
 
@@ -204,21 +188,16 @@ def add_room(request):
     return render(request, "new_site/add_room.html", context)
 
 
-def login(request):
+def log_in(request):
+    """Возвращает форму логина"""
 
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             user = authenticate(username=data["username"], password=data["password"])
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponse("Authenticated successfully")
-                else:
-                    return HttpResponse("Disabled account")
-            else:
-                return HttpResponse("Invalid login")
+            if user and user.is_active:
+                login(request, user)
     else:
         form = LoginForm()
 

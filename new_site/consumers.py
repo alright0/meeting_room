@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.serializers.json import DjangoJSONEncoder
 
 from .models import Schedule
+from .logic import parse_meeting_id
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
@@ -37,7 +38,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def meeting_details(self, text):
 
-        meeting_id = int(text["message"]["meeting_id"].replace("meeting_id_", ""))
+        meeting_id = parse_meeting_id(text["message"]["meeting_id"])
         meeting_dateils = Schedule.meeting_details(meeting_id)
         meeting_dateils["answer"] = text["message"]["answer"]
 

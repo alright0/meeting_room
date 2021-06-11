@@ -21,7 +21,7 @@ function update_meetings(user_id, csrftoken) {
                 $(".meetings").append(`
                 <div class="meeting" id="meeting_id_${rec.id}">
                 <p><b>Организатор встречи:</b> ${rec.organizator_id__first_name} ${rec.organizator_id__last_name}</p>
-                <p><b>Дата:</b> ${start_time.slice(0, 8)} <b>Время встречи с:</b> ${start_time.slice(-5)} <b>до</b>: ${end_time.slice(-5)}</>
+                <p><b>Дата:</b> ${start_time.slice(0, 10)} <b>Время встречи с:</b> ${start_time.slice(-5)} <b>до</b>: ${end_time.slice(-5)}</>
                 <p><b>Место:</b> ${rec.room_id__name}. <b>Тема:</b> ${rec.title}</p>
                 <input type="submit" value="Принять" class="accept" onclick="send_meeting_answer('accept', String(this.parentNode.id))">
                 <input type="submit" value="Отклонить" class="decline" onclick="send_meeting_answer('decline', String(this.parentNode.id))">
@@ -41,9 +41,9 @@ function zfill(num, length) {
     return String(num).padStart(length, "0");
 };
 
-// функция приведения даты к виду "02.05.2021 15:30"
+// функция приведения даты к виду "02.06.2021 15:30"
 function format_date(s_) {
-    return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth(), 2)}.${s_.getFullYear()} ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
+    return `${zfill(s_.getDate(), 2)}.${zfill(s_.getMonth() + 1, 2)}.${s_.getFullYear()} ${zfill(s_.getHours(), 2)}:${zfill(s_.getMinutes(), 2)}`
 };
 
 
@@ -84,7 +84,6 @@ function create_notification(e) {
 // функция относится к созданию встречи
 // меняет значение даты конца, если начальная дата изменилась и стала меньше конечной 
 function start_time_changed(event) {
-
     var start_time = new Date(document.getElementById("id_start_time").value);
     var end_time = new Date(document.getElementById("id_end_time").value)
 
@@ -99,8 +98,6 @@ function start_time_changed(event) {
 function end_time_changed(event) {
     var start_time = new Date(document.getElementById("id_start_time").value);
     var end_time = new Date(document.getElementById("id_end_time").value)
-
-    //console.log(start_time, end_time)
 
     if (end_time <= start_time) {
         var new_start_time = _add_and_format_time_for_datetime_local(end_time, -1);
@@ -146,8 +143,6 @@ function get_room_info(event) {
                 board.checked = response.board
                 projector.checked = response.projector
                 description.value = response.description
-                console.log(response);
-
 
             },
             error: { "response": "Запись не найдена!" }
@@ -176,11 +171,67 @@ function delete_room() {
             type: 'POST',
             data: { 'id': id.value, "csrfmiddlewaretoken": csrftoken },
             success: function (response) {
-                window.location.replace("/")
+                window.location.replace("/") // редирект на главную страницу
             },
             error: function () {
                 alert("что-то пошло не так!");
             }
         })
     }
+}
+
+// функция отправляет ответ менеджера и уведомление организатору через сокет
+function send_answer_to_db_and_organizator(answer, elem, csrftoken) {
+    $.ajax({
+        type: "POST",
+        data: { "answer": answer, "meeting_id": elem, "csrfmiddlewaretoken": csrftoken },
+        success: function (response) {
+            const ws_to_organizator = new WebSocket(`ws://${window.location.host}/user/${response.organizator_id}/`)
+            data = JSON.stringify({ "meeting_id": elem, "answer": answer })
+
+            //отправка уведомления, если сокет готов
+            _check_socket_ready(ws_to_organizator, data)
+        },
+    })
+}
+
+
+// Функция проверяет состояние сокета и отправляет уведомление, если сокет готов
+function _check_socket_ready(sock, data) {
+    if (!sock.readyState) {
+        setTimeout(function () {
+            _check_socket_ready(sock, data);
+        }, 100);
+    } else {
+        sock.send(data)
+        sock.close()
+    }
+};
+
+// скрывает и показывает форму бронирования комнаты
+function show_form() {
+    var elem = document.getElementById('book_table');
+    var button = document.getElementById('show_form_button');
+
+    if (elem.hidden) {
+        button.value = "скрыть бронирование"
+        elem.hidden = false
+    } else {
+        button.value = "показать бронирование"
+        elem.hidden = true
+    };
+}
+
+// Обновляет значение группы пользователя при выборе в select в coworkers
+function get_user_data() {
+    var id = document.getElementById('id_user');
+    $.ajax({
+        type: 'POST',
+        data: { "user": id.value, "csrfmiddlewaretoken": csrftoken },
+        success: function (response) {
+            group = document.getElementById("id_groups")
+            group.checked = response.manager
+
+        },
+    })
 }

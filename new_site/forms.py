@@ -12,6 +12,7 @@ from django.forms.widgets import (
     SelectMultiple,
     TextInput,
 )
+from django.http import request
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -37,7 +38,7 @@ class UserForm(forms.ModelForm):
         label="Сотрудник:",
     )
     groups = forms.BooleanField(
-        label="Менеджер:",
+        label="Является менеджером:",
     )
 
     field_order = ["user", "groups"]
@@ -98,9 +99,6 @@ class RoomForm(forms.ModelForm):
 class ScheduleForm(forms.ModelForm):
     """Форма создания встречи"""
 
-    managers_queryset = User.objects.filter(groups=1).all()
-    manager_id = ModelChoiceField(queryset=managers_queryset, label="Менеджер:")
-
     class Meta:
         model = Schedule
 
@@ -111,6 +109,7 @@ class ScheduleForm(forms.ModelForm):
             "start_time": "Начало:",
             "end_time": "Конец:",
         }
+
 
         widgets = {
             "start_time": DateTimeInput(
@@ -130,8 +129,11 @@ class ScheduleForm(forms.ModelForm):
     def __init__(self, room_id, *args, **kwargs):
         super(ScheduleForm, self).__init__(*args, **kwargs)
         self.room_schedule = Schedule.objects.filter(
-            room_id=room_id, status=True, start_time__gt=timezone.now()
+            room_id=room_id,
+            status=True,
+            start_time__gt=timezone.now(),
         ).all()
+        self.fields["manager_id"].queryset = User.objects.filter(groups=1)
 
     def clean(self, *args, **kwargs):
         room_schedule = self.room_schedule
@@ -139,7 +141,7 @@ class ScheduleForm(forms.ModelForm):
         start_time = cleaned_data["start_time"]
         end_time = cleaned_data["end_time"]
 
-        if start_time < timezone.now():
+        if start_time < timezone.localtime():
             raise ValidationError(_("Дата начала меньше текущего времени!"))
 
         if end_time < start_time:
