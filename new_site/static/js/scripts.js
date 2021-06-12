@@ -109,7 +109,11 @@ function end_time_changed(event) {
 
 // возвращает дату в текстовом формате, подходящую для вставки в datetime-local
 function _add_and_format_time_for_datetime_local(s_, o_) {
-    return `${s_.getFullYear()}-${zfill(s_.getMonth() + 1, 2)}-${zfill(s_.getDate(), 2)}T${zfill(s_.getHours() + o_, 2)}:00`
+
+    s_ = s_.setHours(s_.getHours() + o_)
+    s_ = new Date(s_)
+
+    return `${s_.getFullYear()}-${zfill(s_.getMonth() + 1, 2)}-${zfill(s_.getDate(), 2)}T${zfill(s_.getHours(), 2)}:00`
 
 };
 
@@ -149,7 +153,7 @@ function get_room_info(event) {
         }
         )
     } else {
-        document.getElementById('accept').innerText = "Создать"
+        document.getElementById('accept').innerText = "Добавить"
         room.value = ''
         seats.value = 1
         board.checked = false
@@ -225,13 +229,19 @@ function show_form() {
 // Обновляет значение группы пользователя при выборе в select в coworkers
 function get_user_data() {
     var id = document.getElementById('id_user');
-    $.ajax({
-        type: 'POST',
-        data: { "user": id.value, "csrfmiddlewaretoken": csrftoken },
-        success: function (response) {
-            group = document.getElementById("id_groups")
-            group.checked = response.manager
+    var group_checkbox = document.getElementById("id_groups");
+    if (id.value) {
+        group_checkbox.disabled = false;
+        $.ajax({
+            type: 'POST',
+            data: { "user": id.value, "csrfmiddlewaretoken": csrftoken },
+            success: function (response) {
+                group = document.getElementById("id_groups")
+                group.checked = response.manager;
 
-        },
-    })
+            }, error: { "response": "что-то пошло не так!" }
+        });
+    } else {
+        group_checkbox.disabled = true
+    }
 }

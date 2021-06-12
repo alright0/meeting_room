@@ -27,13 +27,12 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class UserForm(forms.ModelForm):
+class UserForm(forms.Form):
     """Форма обновления данных пользователя"""
 
-    users = User.objects.all()
-
+    queryset = User.objects.all()
     user = forms.ModelChoiceField(
-        queryset=users,
+        queryset=queryset,
         required=False,
         label="Сотрудник:",
     )
@@ -43,15 +42,10 @@ class UserForm(forms.ModelForm):
 
     field_order = ["user", "groups"]
 
-    class Meta:
-        model = User
-        fields = ["id", "groups"]
-        labels = {
-            "id": "Сотрудник",
-        }
-
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
+
+        self.fields["user"].label_from_instance = lambda user: f"{user.get_full_name()}"
 
 
 class RoomForm(forms.ModelForm):
@@ -110,7 +104,6 @@ class ScheduleForm(forms.ModelForm):
             "end_time": "Конец:",
         }
 
-
         widgets = {
             "start_time": DateTimeInput(
                 attrs={
@@ -134,6 +127,9 @@ class ScheduleForm(forms.ModelForm):
             start_time__gt=timezone.now(),
         ).all()
         self.fields["manager_id"].queryset = User.objects.filter(groups=1)
+        self.fields[
+            "manager_id"
+        ].label_from_instance = lambda user: f"{user.get_full_name()}"
 
     def clean(self, *args, **kwargs):
         room_schedule = self.room_schedule
@@ -149,10 +145,10 @@ class ScheduleForm(forms.ModelForm):
 
         for record in room_schedule:
             if (
-                start_time >= record.start_time
-                and start_time <= record.end_time
-                or end_time >= record.start_time
-                and end_time <= record.end_time
+                start_time > record.start_time
+                and start_time < record.end_time
+                or end_time > record.start_time
+                and end_time < record.end_time
             ):
                 raise ValidationError(
                     _("Эта дата уже занята! Пожалуйста, выберите другую дату")

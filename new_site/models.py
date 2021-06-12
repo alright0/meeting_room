@@ -92,7 +92,7 @@ class Schedule(models.Model):
         for room in rooms:
             nearest_meeting = (
                 cls.objects.filter(
-                    room_id_id=room.id, status=True, start_time__gt=timezone.localtime()
+                    room_id_id=room.id, status=True, end_time__gte=timezone.localtime()
                 )
                 .order_by("start_time")
                 .first()
@@ -116,7 +116,7 @@ class Schedule(models.Model):
 
         return list(
             cls.objects.filter(
-                room_id_id=room.id, status=True, start_time__gt=timezone.localtime()
+                room_id_id=room.id, status=True, end_time__gte=timezone.localtime()
             )
             .order_by("start_time")
             .all()
@@ -128,7 +128,7 @@ class Schedule(models.Model):
 
         return list(
             cls.objects.filter(
-                manager_id_id=user_id, status=None, start_time__gt=timezone.localtime()
+                manager_id_id=user_id, status=None, start_time__gte=timezone.localtime()
             )
             .values(
                 "organizator_id",

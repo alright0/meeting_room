@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-e7$-9welq=zuv((0f=!fx_pt&a(ulj8atew(0%qg8**lk*=dt=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.0.104", "10.81.50.112"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -79,14 +79,14 @@ CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
-}
+}"""
 
-"""DATABASES = {
+DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "meeting_room",
@@ -95,7 +95,7 @@ DATABASES = {
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
-}"""
+}
 
 
 # Password validation

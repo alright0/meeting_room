@@ -48,8 +48,15 @@
     var start = _add_and_format_time_for_datetime_local(new Date(), 1)
     var end = _add_and_format_time_for_datetime_local(new Date(), 2)
 
-    document.getElementById("id_start_time").value = start
-    document.getElementById("id_end_time").value = end
+    initial_start_time = document.getElementById("id_start_time").value
+    initial_end_time = document.getElementById("id_end_time").value
+
+    // проверить, пытался ли пользователь установить время. Если не пытался, задать время,
+    // иначе оставить то, что пытался ввести пользователь
+    if (!initial_start_time || !initial_end_time) {
+        document.getElementById("id_start_time").value = start
+        document.getElementById("id_end_time").value = end
+    }
 
     document.getElementById("id_start_time").addEventListener("change", start_time_changed)
     document.getElementById("id_end_time").addEventListener("change", end_time_changed)
