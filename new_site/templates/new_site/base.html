@@ -44,7 +44,6 @@
 <script>
     // Здесь формируются уведомления и открывается вебсокет на свой user_id 
     Notification.requestPermission().then(function (result) {
-        console.log(result);
         if (Notification.permission === 'granted') {
 
             const ws = new WebSocket(`ws://${window.location.host}/user/{{user.id}}/`)

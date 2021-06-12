@@ -81,6 +81,13 @@ class Schedule(models.Model):
         start_time = formatted_time(self.start_time)
         end_time = formatted_time(self.end_time)
 
+        if self.status == None:
+            status = "Ожидает подтверждения"
+        elif self.status:
+            status = "Подтверждена"
+        else:
+            status = "Отклонена"
+
         return f"Начало: {start_time}, Конец: {end_time}. Статус: {status}"
 
     @classmethod

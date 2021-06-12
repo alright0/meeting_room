@@ -126,7 +126,7 @@ class ScheduleForm(forms.ModelForm):
             status=True,
             start_time__gt=timezone.now(),
         ).all()
-        self.fields["manager_id"].queryset = User.objects.filter(groups=1)
+        self.fields["manager_id"].queryset = User.objects.filter(groups__name="manager")
         self.fields[
             "manager_id"
         ].label_from_instance = lambda user: f"{user.get_full_name()}"
