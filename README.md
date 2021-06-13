@@ -52,7 +52,7 @@
 </ul>
 
 <p align="center"><b>Логин</p></b>
-https://git-rooms.herokuapp.com/login/
+https://git-rooms.herokuapp.com/login/ <br>
 <p align="center"><img width=350px src="https://user-images.githubusercontent.com/71926912/121807401-a0194400-cc5c-11eb-9483-282875c09d2f.PNG"></p>
 Авторизоваться можно, используя следующих пользователей(Логины: <b>test1, test2, test3, test4</b>. Пароль ко всем пользователям: <b>UserUser1</b>):
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121807891-bb854e80-cc5e-11eb-8682-f9137f37575e.PNG"></p>
@@ -65,25 +65,18 @@ https://git-rooms.herokuapp.com/ <br>
 Список встреч обновляется каждые 10 секунд без перезагрузки страницы. 
 Потверждение/отклонение встречи удаляет встречу из списка и показывает на ее месте уведомление о действии пользователя:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121810084-0fe0fc00-cc68-11eb-8598-ff0714099cba.PNG"></p>
-
-
-
 Инициатор собрания, в свою очередь, получает уведомление о подтверждении/отклонении встречи:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808233-2c793600-cc60-11eb-94cb-c6689e7bec36.PNG"></p>
-Если назначенных встреч нет, офис-менеджер видит экран с сообщением об отсутствии встреч: 
-<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808333-98f43500-cc60-11eb-87a3-a8491699d5a2.PNG"></p>
 
 Так видит главный экран обычный сотрудник:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808115-bd034680-cc5f-11eb-8fa2-cf786ddb5cfb.PNG"></p>
-
+<br><br>
 <p align="center"><b>Назначение встреч</p></b>
 https://git-rooms.herokuapp.com/rooms/1 
 
 При переходе в любую из комнат можно увидеть кнопку бронирования и список назначенных встреч:
-<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808420-1ddf4e80-cc61-11eb-885f-ba97d10caef3.PNG"></p>
-
 При нажатии на кнопку бронирования открывается экран с параметрами бронирования: Списком офис-менеджеров, темой собрания, началом и концом собрания
-<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808485-639c1700-cc61-11eb-8030-4bb0d3ed2293.PNG"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121810224-9eee1400-cc68-11eb-8eb7-680504006bd8.png"></p>
 
 <p align="center"><b>Редактирование информации о комнатах</p></b>
 https://git-rooms.herokuapp.com/addroom/
