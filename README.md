@@ -1,6 +1,6 @@
 Ссылка: https://git-rooms.herokuapp.com/
 
-<p><b>Техническое задание</b></p>
+<p align="center"><b>Техническое задание</b></p>
 
 <b><p>Python, Django, PostgreSQL, Rest-API, MVC</b></p>
 
