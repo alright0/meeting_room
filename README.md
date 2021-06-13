@@ -52,13 +52,23 @@
 </ul>
 
 <p align="center"><b>Логин</p></b>
-
+https://git-rooms.herokuapp.com/login/
 <p align="center"><img width=350px src="https://user-images.githubusercontent.com/71926912/121807401-a0194400-cc5c-11eb-9483-282875c09d2f.PNG"></p>
 Авторизоваться можно, используя следующих пользователей(Логины: <b>test1, test2, test3, test4</b>. Пароль ко всем пользователям: <b>UserUser1</b>):
-<p align="center"><img width=700px src="https://user-images.githubusercontent.com/71926912/121807721-fe92f200-cc5d-11eb-932a-7cbe940265bd.PNG"></p>
-![Uploading 8.PNG…]()
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121807891-bb854e80-cc5e-11eb-8682-f9137f37575e.PNG"></p>
+Некоторые из этих пользователей являются офис-менеджерами и входят в группу "manager", все пользователи входят в группу "coworker" автоматически при создании пользователя.
+
+<p align="center"><b>Главный экран</p></b>
+https://git-rooms.herokuapp.com/
+На главном экране находится список всех комнат, кнопка "Добавить комнату" и список встречь или уведомление об их отсутствии. В навбаре видно список доступных ссылок.
+Так видит главный экран офис-менеджер:
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121807981-2df62e80-cc5f-11eb-9e85-3c47a9eae180.PNG"></p>
+
+Так видит главный экран обычный сотрудник:
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808115-bd034680-cc5f-11eb-8fa2-cf786ddb5cfb.PNG"></p>
 
 
 
 
-<!-- <p align="center"><img width=700px src=" "></p> -->
+
+<!-- <p align="center"><img src=" "></p> -->
