@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.http import request
-from django.test import TestCase, RequestFactory
-from new_site.views import log_in, add_room, index, room_schedule, coworkers
-from new_site.models import Room, Schedule
+from django.test import RequestFactory, TestCase
+
+from new_site.models import Room
+from new_site.views import add_room, coworkers, index, room_schedule
+
 
 User = get_user_model()
-
 
 class coworker_user_access(TestCase):
     def setUp(self) -> None:

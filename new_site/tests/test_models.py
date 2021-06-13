@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from new_site.models import Room, Schedule
-from new_site.forms import LoginForm, UserForm, RoomForm, ScheduleForm
 
 
 User = get_user_model()

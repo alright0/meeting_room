@@ -85,7 +85,7 @@ function create_notification(e) {
         var answer = "отклонил(а)"
     }
 
-    title_str = `Собрание в ${format_date(new Date(data.start_time))}\nТема: ${data.title}`
+    title_str = `Собрание ${format_date(new Date(data.start_time)).slice(0, 10)} в ${format_date(new Date(data.start_time)).slice(-5)}\nТема: ${data.title}`
     body_str = `${data.manager_id__first_name} ${data.manager_id__last_name} ${answer} встречу`
 
     return { "title": title_str, 'body': body_str }

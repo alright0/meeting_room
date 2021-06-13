@@ -1,19 +1,16 @@
 import json
 from datetime import datetime
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, User
-from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse, request
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.utils import timezone
 
 from .forms import LoginForm, RoomForm, ScheduleForm, UserForm
-from .logic import formatted_time, parse_meeting_id
+from .logic import parse_meeting_id
 from .models import Room, Schedule
-from django.http import HttpResponseNotFound
 
 
 @login_required

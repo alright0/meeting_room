@@ -1,7 +1,7 @@
+from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from new_site.forms import RoomForm, ScheduleForm
-from django.contrib.auth.models import User, Group
-from new_site.models import Room, Schedule
+from new_site.models import Room
 
 
 class TestScheduleForm(TestCase):

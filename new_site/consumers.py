@@ -1,14 +1,11 @@
 import json
 
-from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.core.serializers.json import DjangoJSONEncoder
 
-from .models import Schedule
 from .logic import parse_meeting_id
+from .models import Schedule
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
