@@ -106,6 +106,9 @@ https://git-rooms.herokuapp.com/addroom/
 
 
 
+Все экраны поддерживают мобильную версию(только портретная ориентация)
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121809438-76184f80-cc65-11eb-8eba-14337f4499c2.jpg"></p>
+
 <!-- 
 <p align="center"><img src=" "></p>
  -->
