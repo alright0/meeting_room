@@ -1,4 +1,4 @@
-// функция обновления списка встречь
+// функция обновления списка встреч
 function update_meetings(user_id, csrftoken) {
     $.ajax({
         type: 'post',
@@ -9,19 +9,29 @@ function update_meetings(user_id, csrftoken) {
             $(".meetings").append("<h2>Встречи для согласования</h2>")
 
             if (!response.length) {
-                $(".meetings").append('<p style="text-align:center;">Новых встречь нет.</p>')
+                $(".meetings").append('<p style="text-align:center;">Новых встреч нет.</p>')
             }
 
             //Для каждой встречи создать контейнер
             $.each(response, function (record) {
                 rec = response[record];
+
                 start_time = format_date(new Date(rec.start_time))
                 end_time = format_date(new Date(rec.end_time))
+
+                if (new Date(rec.start_time).getDate() == new Date(rec.end_time).getDate()) {
+                    date_string = `<p><b>Дата:</b> ${start_time.slice(0, 10)} <b>Время встречи с:</b> ${start_time.slice(-5)} <b>до</b>: ${end_time.slice(-5)}</p>`
+                } else {
+                    date_string = `<p><b> Дата и время встречи с:</b> ${start_time} <b>по</b>: ${end_time}</p>`
+                }
+
+
+
 
                 $(".meetings").append(`
                 <div class="meeting" id="meeting_id_${rec.id}">
                 <p><b>Организатор встречи:</b> ${rec.organizator_id__first_name} ${rec.organizator_id__last_name}</p>
-                <p><b>Дата:</b> ${start_time.slice(0, 10)} <b>Время встречи с:</b> ${start_time.slice(-5)} <b>до</b>: ${end_time.slice(-5)}</>
+                ${date_string}
                 <p><b>Место:</b> ${rec.room_id__name}. <b>Тема:</b> ${rec.title}</p>
                 <input type="submit" value="Принять" class="accept" onclick="send_meeting_answer('accept', String(this.parentNode.id))">
                 <input type="submit" value="Отклонить" class="decline" onclick="send_meeting_answer('decline', String(this.parentNode.id))">

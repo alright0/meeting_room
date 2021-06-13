@@ -31,9 +31,18 @@
         {% if schedule %}
         <ul>
             {% for meeting in schedule %}
-            <li><b>Начало:</b> {{meeting.start_time|date:"d.m.Y H:i"}} -
-                <b>Конец:</b> {{meeting.end_time|date:"d.m.Y H:i"}}.
+            {% if meeting.start_time|date:"d.m.Y" == meeting.end_time|date:"d.m.Y" %}
+            <li><b>Дата:</b> {{meeting.start_time|date:"d.m.Y"}}
+                <b>c</b> {{meeting.start_time|date:"H:i"}}
+                <b>до</b> {{meeting.end_time|date:"H:i"}}
             </li>
+            {% else %}
+            <li><b>Начало:</b> {{meeting.start_time|date:"d.m.Y H:i"}} -
+                <b>Конец:</b> {{meeting.end_time|date:"d.m.Y H:i"}}
+            </li>
+            {% endif %}
+            <p style="margin-bottom: 5px;"><b>Организатор:</b>
+                {{meeting.organizator_id.get_full_name}}</p>
             {% endfor %}
         </ul>
         {% else %}

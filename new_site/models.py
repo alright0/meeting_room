@@ -131,7 +131,7 @@ class Schedule(models.Model):
 
     @classmethod
     def meetings_to_approve(cls, user_id: int) -> list:
-        """Принимает ``user_id`` и возвращает список  встречь для подтверждения"""
+        """Принимает ``user_id`` и возвращает список  встреч для подтверждения"""
 
         return list(
             cls.objects.filter(
