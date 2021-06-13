@@ -71,11 +71,17 @@ https://git-rooms.herokuapp.com/
 Если назначенных встречь нет, офис-менеджер видит экран с сообщением об отсутствии встречь: 
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808333-98f43500-cc60-11eb-87a3-a8491699d5a2.PNG"></p>
 
-
-
 Так видит главный экран обычный сотрудник:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808115-bd034680-cc5f-11eb-8fa2-cf786ddb5cfb.PNG"></p>
 
+<p align="center"><b>Назначение встречь</p></b>
+https://git-rooms.herokuapp.com/rooms/1 
+
+При переходе в любую из комнат можно увидеть кнопку бронирования и список назначенных встречь:
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808420-1ddf4e80-cc61-11eb-885f-ba97d10caef3.PNG"></p>
+
+При нажатии на кнопку бронирования открывается экран с параметрами бронирования: Списком офис-менеджеров, темой собрания, началом и концом собрания
+![Uploading 11.PNG…]()
 
 
 <!-- 
