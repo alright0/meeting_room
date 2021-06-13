@@ -65,6 +65,7 @@ def room_schedule(request, room_id):
 
     if request.method == "POST":
         form = ScheduleForm(room_id, request.POST)
+        print(request.POST)
         if form.is_valid():
             new_meeting = Schedule(
                 start_time=request.POST["start_time"],
@@ -74,6 +75,7 @@ def room_schedule(request, room_id):
                 room_id=Room.objects.get(id=room_id),
                 title=request.POST["title"],
             )
+
             new_meeting.save()
             return redirect("/")
 

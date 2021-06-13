@@ -1,21 +1,13 @@
 from datetime import datetime
 
 from django import forms
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms.fields import CharField, ChoiceField
+from django.forms.fields import CharField
 from django.forms.models import ModelChoiceField
-from django.forms.widgets import (
-    DateTimeInput,
-    Select,
-    SelectDateWidget,
-    SelectMultiple,
-    TextInput,
-)
-from django.http import request
+from django.forms.widgets import DateTimeInput
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
 
 from .models import Room, Schedule
 
@@ -23,15 +15,15 @@ from .models import Room, Schedule
 class LoginForm(forms.Form):
     """логин"""
 
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = CharField()
+    password = CharField(widget=forms.PasswordInput)
 
 
 class UserForm(forms.Form):
     """Форма обновления данных пользователя"""
 
     queryset = User.objects.all()
-    user = forms.ModelChoiceField(
+    user = ModelChoiceField(
         queryset=queryset,
         required=False,
         label="Сотрудник:",
@@ -136,12 +128,21 @@ class ScheduleForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         start_time = cleaned_data["start_time"]
         end_time = cleaned_data["end_time"]
+        manager_id = cleaned_data["manager_id"]
 
         if start_time < timezone.localtime():
             raise ValidationError(_("Дата начала меньше текущего времени!"))
 
         if end_time < start_time:
             raise ValidationError(_("Дата окончания совещания меньше даты начала!"))
+
+        manager = User.objects.get(id=manager_id.id)
+        if not manager.groups.filter(name="manager"):
+            raise ValidationError(
+                _(
+                    "Вы не можете назначить встречу сотруднику, не являющемуся офис-менеджером!"
+                )
+            )
 
         for record in room_schedule:
             if (
