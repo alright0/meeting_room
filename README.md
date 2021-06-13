@@ -63,12 +63,21 @@ https://git-rooms.herokuapp.com/
 На главном экране находится список всех комнат, кнопка "Добавить комнату" и список встречь или уведомление об их отсутствии. В навбаре видно список доступных ссылок.
 Так видит главный экран офис-менеджер:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121807981-2df62e80-cc5f-11eb-9e85-3c47a9eae180.PNG"></p>
+Список встречь обновляется каждые 10 секунд без перезагрузки страницы. 
+Потверждение/отклонение встречи удаляет встречу из списка и показывает на ее месте уведомление о действии пользователя:
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808194-094e8680-cc60-11eb-8d7e-71bf03a7f760.PNG"></p>
+Инициатор собрания, в свою очередь, получает уведомление о подтверждении/отклонении встречи:
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808233-2c793600-cc60-11eb-94cb-c6689e7bec36.PNG"></p>
+Если назначенных встречь нет, офис-менеджер видит экран с сообщением об отсутствии встречь: 
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808333-98f43500-cc60-11eb-87a3-a8491699d5a2.PNG"></p>
+
+
 
 Так видит главный экран обычный сотрудник:
 <p align="center"><img src="https://user-images.githubusercontent.com/71926912/121808115-bd034680-cc5f-11eb-8fa2-cf786ddb5cfb.PNG"></p>
 
 
 
-
-
-<!-- <p align="center"><img src=" "></p> -->
+<!-- 
+<p align="center"><img src=" "></p>
+ -->
