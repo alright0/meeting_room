@@ -82,8 +82,7 @@ https://git-rooms.herokuapp.com/login/ <br>
 Авторизоваться можно, используя следующих пользователей:<br>
 Логины: <b>test1, test2, test3, test4</b>.<br>
 Пароль ко всем пользователям: <b>UserUser1</b>:<br>
-<p align="center"><img width=350px src="https://user-images.githubusercontent.com/71926912/121807401-a0194400-cc5c-11eb-9483-282875c09d2f.PNG"></p>
-<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121807891-bb854e80-cc5e-11eb-8682-f9137f37575e.PNG"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/71926912/121812283-f04dd180-cc6f-11eb-8fc6-a1b3511b21ca.png"></p>
 
 <br><br>
 <p align="center"><b>Главный экран</p></b>
