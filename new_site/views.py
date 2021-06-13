@@ -96,7 +96,7 @@ def room_schedule(request, room_id):
 
 
 @login_required
-@permission_required("change_user")
+@permission_required("auth.change_user", login_url="/login/")
 def coworkers(request):
     """Возвращает страницу управления группами пользователей"""
 
@@ -105,10 +105,7 @@ def coworkers(request):
         user_id = request.POST["user"]
         if user_id and request.is_ajax():
             is_manager = Group.objects.filter(user=user_id, name="manager").first()
-            if is_manager:
-                manager = {"manager": True}
-            else:
-                manager = {"manager": False}
+            manager = {"manager": True if is_manager else False}
             return HttpResponse(
                 json.dumps(manager, cls=DjangoJSONEncoder),
                 content_type="application/json",
@@ -131,7 +128,7 @@ def coworkers(request):
 
 
 @login_required
-@permission_required("add_room")
+@permission_required("new_site.add_room", login_url="/login/")
 def add_room(request):
     """Возвращает страницу с формой создания комнаты"""
 
