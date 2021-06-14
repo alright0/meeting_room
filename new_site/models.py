@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from .logic import formatted_time
@@ -29,7 +30,8 @@ class Room(models.Model):
         return f"{self.name}. {self.seats} мест(а). {include_board}{include_projector}{description}"
 
     @classmethod
-    def get_room_info(cls, room_id):
+    def get_room_info(cls, room_id: int) -> dict:
+        """Возвращает описание комнаты для полей в форме добавления комнаты"""
 
         room = cls.objects.get(id=room_id)
 
@@ -89,8 +91,10 @@ class Schedule(models.Model):
         return f"Начало: {start_time}, Конец: {end_time}. Статус: {status}"
 
     @classmethod
-    def get_room_statuses(cls, rooms) -> dict:
-        """Возвращает словарь ``{room_id: ближайшая дата совещания}``"""
+    def get_room_statuses(cls, rooms: QuerySet) -> dict:
+        """Возвращает словарь вида ``{room_id: ближайшая дата совещания}``
+        для отображения информации о комнате
+        """
 
         schedule = dict()
 
@@ -116,7 +120,7 @@ class Schedule(models.Model):
         return schedule
 
     @classmethod
-    def get_room_schedule(cls, room: Room) -> list:
+    def get_room_schedule(cls, room: QuerySet) -> list:
         """Принимает экземпляр комнаты и Возвращает расписание комнаты"""
 
         return list(

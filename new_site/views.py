@@ -62,7 +62,7 @@ def room_schedule(request, room_id):
 
     if request.method == "POST":
         form = ScheduleForm(room_id, request.POST)
-        print(request.POST)
+
         if form.is_valid():
             new_meeting = Schedule(
                 start_time=request.POST["start_time"],
