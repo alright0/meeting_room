@@ -149,13 +149,7 @@ def add_room(request):
             if room:
                 room.delete()
 
-                return HttpResponse(
-                    json.dumps(
-                        {"response": "deleted"},
-                        cls=DjangoJSONEncoder,
-                    ),
-                    content_type="application/json",
-                )
+                return redirect("/")
 
         # обновляет или добавляет комнату
         if "add" in request.POST.keys():
